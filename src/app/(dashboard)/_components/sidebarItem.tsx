@@ -23,7 +23,7 @@ export default function SidebarItem({icon: Icon, path, label }: SidebarItemProp)
     )}>
         <div className="flex gap-x-2 items-center py-4">
             <Icon />
-            <p>{label}</p>
+            {label}
         </div>
         <div 
             className={cn("h-full ml-auto border-2 border-sky-700  opacity-0 transition-all", isActive && "opacity-100")}
