@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <main className="p-24">
       <p>Home</p>
-      <UserButton />
+      <UserButton afterSignOutUrl="/"/>
     </main>
   );
 }
