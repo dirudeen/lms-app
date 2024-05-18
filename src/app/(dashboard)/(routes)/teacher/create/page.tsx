@@ -16,10 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { createCourse } from "@/actions/course";
+import { useRouter } from "next/navigation";
 export default function CreatePage() {
+    const router = useRouter()
+
   const titleValidation = z.object({
     title: z.string().min(1, { message: "Title is required" }),
   });
@@ -36,7 +38,8 @@ export default function CreatePage() {
     // await new Promise(resolve => setTimeout(resolve, 4000))
     try {
         const data = await createCourse(values)
-        console.log(data)
+        toast.success("Course created")
+        router.push("/teacher/courses/" + data.id)
     } catch (error) {
         if(error instanceof Error){
             toast.error(error.message)
