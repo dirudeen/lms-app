@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
+import { createCourse } from "@/actions/course";
 export default function CreatePage() {
   const titleValidation = z.object({
     title: z.string().min(1, { message: "Title is required" }),
@@ -31,9 +33,17 @@ export default function CreatePage() {
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof titleValidation>) => {
-    await new Promise(resolve => setTimeout(resolve, 4000))
-    console.log(values);
+    // await new Promise(resolve => setTimeout(resolve, 4000))
+    try {
+        const data = await createCourse(values)
+        console.log(data)
+    } catch (error) {
+        if(error instanceof Error){
+            toast.error(error.message)
+        }
+    }
   };
+
   return (
     <div className="max-w-5xl mx-auto flex h-full p-6 sm:justify-center sm:items-center">
       <div className="space-y-8">
