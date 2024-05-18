@@ -3,9 +3,9 @@ import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
-    <main className="p-24">
+    <div>
       <p>Home</p>
       <UserButton afterSignOutUrl="/"/>
-    </main>
+    </div>
   );
 }
