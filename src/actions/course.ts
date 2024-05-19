@@ -1,6 +1,5 @@
 "use server";
 
-import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 
 const { userId } = auth();
@@ -11,12 +10,7 @@ export async function createCourse({ title }: { title: string }) {
   }
 
   try {
-    const course = await db.course.create({
-      data: {
-        title,
-        userId,
-      },
-    });
+    const course = {};
     return course;
   } catch (error) {
     console.log(["COURSE CREATION", error]);
