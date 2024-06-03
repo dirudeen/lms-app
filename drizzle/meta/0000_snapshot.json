@@ -1,11 +1,11 @@
 {
-  "id": "36483e58-0280-46da-938a-d95ace6d2f57",
+  "id": "2a8a4842-236e-4db6-8720-74362fb30c20",
   "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "Attachments": {
-      "name": "Attachments",
+    "public.Attachment": {
+      "name": "Attachment",
       "schema": "",
       "columns": {
         "id": {
@@ -26,13 +26,27 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "Attachments_courseId_Course_id_fk": {
-          "name": "Attachments_courseId_Course_id_fk",
-          "tableFrom": "Attachments",
+        "Attachment_courseId_Course_id_fk": {
+          "name": "Attachment_courseId_Course_id_fk",
+          "tableFrom": "Attachment",
           "tableTo": "Course",
           "columnsFrom": [
             "courseId"
@@ -47,7 +61,30 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Course": {
+    "public.Category": {
+      "name": "Category",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Course": {
       "name": "Course",
       "schema": "",
       "columns": {
@@ -97,15 +134,9 @@
         },
         "categoryId": {
           "name": "categoryId",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": false
-        },
-        "attachment": {
-          "name": "attachment",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "createdAt": {
           "name": "createdAt",
@@ -123,7 +154,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "Course_categoryId_Category_id_fk": {
+          "name": "Course_categoryId_Category_id_fk",
+          "tableFrom": "Course",
+          "tableTo": "Category",
+          "columnsFrom": [
+            "categoryId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }
