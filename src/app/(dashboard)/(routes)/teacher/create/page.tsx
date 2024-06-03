@@ -19,14 +19,13 @@ import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { createCourse } from "@/actions/course";
 import { useRouter } from "next/navigation";
+import { titleInputValidation } from "@/types";
+
 export default function CreatePage() {
     const router = useRouter()
 
-  const titleValidation = z.object({
-    title: z.string().min(1, { message: "Title is required" }),
-  });
   const form = useForm({
-    resolver: zodResolver(titleValidation),
+    resolver: zodResolver(titleInputValidation),
     defaultValues: {
       title: "",
     },
@@ -34,7 +33,7 @@ export default function CreatePage() {
 
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof titleValidation>) => {
+  const onSubmit = async (values: z.infer<typeof titleInputValidation>) => {
     // await new Promise(resolve => setTimeout(resolve, 4000))
     try {
         const data = await createCourse(values)
