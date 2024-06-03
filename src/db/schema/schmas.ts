@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { text, pgTable, numeric, boolean, uuid, timestamp } from "drizzle-orm/pg-core";
-import { db } from "..";
-
+import {createInsertSchema} from "drizzle-zod"
+import { z } from "zod";
 
 export const course = pgTable('Course', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
@@ -19,7 +19,11 @@ export const course = pgTable('Course', {
   
   
 });
-
+// Schema for inserting a course 
+export const insertCourseSchema = createInsertSchema(course, {
+  title: z.string().min(1, {message: "Title must be at least 3 characters"}),
+  userId: z.string()
+})
 
 export const attachment = pgTable("Attachments", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
