@@ -12,7 +12,7 @@ export const course = pgTable('Course', {
   price: numeric('price', {precision: 12, scale: 2}),
   isPublished: boolean("isPublished").default(false),
 
-  categoryId: uuid("categoryId").notNull().references(() => category.id),
+  categoryId: uuid("categoryId").references(() => category.id),
 
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull()
