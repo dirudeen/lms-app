@@ -1,6 +1,7 @@
 import { fetchCourse } from "@/actions/course";
 import { IconBadge } from "@/components/IconBadge";
 import { LayoutDashboard } from "lucide-react";
+import { TitleForm } from "./_components/TitleForm";
 
 interface Props {
   params: {
@@ -38,6 +39,8 @@ export default async function CoursePage({ params: { courseId } }: Props) {
             <IconBadge icon={LayoutDashboard} />
             <h2 className="text-xl">Customize your course</h2>
           </div>
+
+          <TitleForm initialData={course} courseId={course.id} />
         </div>
       </div>
     </div>
