@@ -16,15 +16,15 @@ export async function createCourse({ title }: { title: string }) {
   // validate the title and userId before inserting to db
   const validatedCourseDraft = insertCourseSchema.parse({
     title,
-    userId
-  })
-  console.log({title, userId})
+    userId,
+  });
+  console.log({ title, userId });
   try {
     const course = await db
-    .insert(courseTable)
-    .values(validatedCourseDraft)
-    .returning()
-    .then(res => res[0])
+      .insert(courseTable)
+      .values(validatedCourseDraft)
+      .returning()
+      .then((res) => res[0]);
 
     return course;
   } catch (error) {
@@ -32,7 +32,6 @@ export async function createCourse({ title }: { title: string }) {
     throw new Error("Failed to create a course");
   }
 }
-
 
 export async function fetchCourse(courseId: string) {
   const { userId } = auth();
@@ -42,13 +41,13 @@ export async function fetchCourse(courseId: string) {
 
   try {
     const course = await db
-    .select()
-    .from(courseTable)
-    .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)))
-    .then(res => res[0])
+      .select()
+      .from(courseTable)
+      .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)))
+      .then((res) => res[0]);
 
     if (!course) {
-      redirect("/")
+      redirect("/");
     }
     return course;
   } catch (error) {
