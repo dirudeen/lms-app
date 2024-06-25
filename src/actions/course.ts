@@ -5,8 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { insertCourseSchema } from "@/db/schema/schmas";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
-
-
+import { revalidatePath } from "next/cache";
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -53,5 +52,39 @@ export async function fetchCourse(courseId: string) {
   } catch (error) {
     console.log(["GET COURSES", error]);
     throw new Error("Failed to get courses");
+  }
+}
+
+interface UpdateCourseProps {
+  values: {
+    title: string;
+  };
+  courseId: string;
+  path: string;
+}
+export async function updateCourse({
+  values,
+  courseId,
+  path,
+}: UpdateCourseProps) {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("Unautherized");
+  }
+
+  try {
+    const updatedCourse = await db
+      .update(courseTable)
+      .set(values)
+      .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)))
+      .returning()
+      .then((res) => res[0]);
+    revalidatePath(path);
+
+    console.log(updatedCourse);
+    return updatedCourse;
+  } catch (error) {
+    console.log(["UPDATE COURSE", error]);
+    throw new Error("Failed to update the course");
   }
 }
