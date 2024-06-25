@@ -17,6 +17,7 @@ export async function createCourse({ title }: { title: string }) {
     title,
     userId
   })
+  console.log({title, userId})
   try {
     const course = await db
     .insert(courseTable)
