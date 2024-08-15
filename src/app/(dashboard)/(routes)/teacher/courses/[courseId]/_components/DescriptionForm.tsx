@@ -14,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { descriptionInputValidation } from "@/types";
 import { PencilIcon } from "lucide-react";
@@ -22,6 +21,8 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { updateCourse } from "@/actions/course";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/Spinner";
 
 interface DescriptionFormProps {
   initialData: {
@@ -86,7 +87,7 @@ export function DescriptionForm({ initialData, courseId }: DescriptionFormProps)
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="e.g. This course is about..." {...field} />
+                      <Textarea placeholder="e.g. This course is about..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -97,7 +98,7 @@ export function DescriptionForm({ initialData, courseId }: DescriptionFormProps)
                 disabled={isSubmitting || !isValid}
                 className="ml-auto"
               >
-                Save
+                {isSubmitting ? (<Spinner className="text-white" size={"small"}/>) : "save"}
               </Button>
             </form>
           </Form>
