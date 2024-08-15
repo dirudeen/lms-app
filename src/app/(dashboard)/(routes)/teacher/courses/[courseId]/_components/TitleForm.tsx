@@ -21,6 +21,7 @@ import { PencilIcon } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { updateCourse } from "@/actions/course";
+import { Spinner } from "@/components/Spinner";
 
 interface TitleFormProps {
   initialData: {
@@ -90,7 +91,7 @@ export function TitleForm({ initialData, courseId }: TitleFormProps) {
                 disabled={isSubmitting || !isValid}
                 className="ml-auto"
               >
-                Save
+                {isSubmitting ? (<Spinner className="text-white" size={"small"}/>) : "save"}
               </Button>
             </form>
           </Form>
