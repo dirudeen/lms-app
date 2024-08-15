@@ -36,5 +36,6 @@ export const attachment = pgTable("Attachment", {
 // Schema for inserting a course 
 export const insertCourseSchema = createInsertSchema(course, {
   title: z.string().min(1, {message: "Title must be at least 3 characters"}),
-  userId: z.string()
+  userId: z.string(),
+  description: z.string().optional()
 })
