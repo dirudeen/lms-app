@@ -70,7 +70,7 @@ export function DescriptionForm({ initialData, courseId }: DescriptionFormProps)
           ) : (
             <>
               <PencilIcon className="size-4 mr-3" />
-              Edit
+              Edit description
             </>
           )}
         </Button>

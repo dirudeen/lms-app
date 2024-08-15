@@ -65,7 +65,7 @@ export function TitleForm({ initialData, courseId }: TitleFormProps) {
           ) : (
             <>
               <PencilIcon className="size-4 mr-3" />
-              Edit
+              Edit title
             </>
           )}
         </Button>
