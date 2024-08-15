@@ -6,6 +6,7 @@ import { insertCourseSchema } from "@/db/schema/schmas";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { Course } from "@/types";
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -57,8 +58,8 @@ export async function fetchCourse(courseId: string) {
 
 interface UpdateCourseProps {
   values: {
-    title: string;
-  };
+    [key in keyof Course]?: Course[key]
+  }
   courseId: string;
   path: string;
 }
