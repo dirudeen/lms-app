@@ -3,6 +3,7 @@ import { IconBadge } from "@/components/IconBadge";
 import { LayoutDashboard } from "lucide-react";
 import { TitleForm } from "./_components/TitleForm";
 import { DescriptionForm } from "./_components/DescriptionForm";
+import { ImageForm } from "./_components/ImageForm";
 
 interface Props {
   params: {
@@ -42,7 +43,8 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           </div>
 
           <TitleForm initialData={course} courseId={course.id} />
-          <DescriptionForm initialData={course} courseId={course.id} />
+          {/* <DescriptionForm initialData={course} courseId={course.id} /> */}
+          <ImageForm courseId={course.id} initialData={course} />
         </div>
       </div>
     </div>
