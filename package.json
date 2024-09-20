@@ -22,7 +22,7 @@
     "drizzle-orm": "^0.31.0",
     "drizzle-zod": "^0.5.1",
     "lucide-react": "^0.378.0",
-    "next": "14.2.3",
+    "next": "14.2.13",
     "pg": "^8.11.5",
     "postgres": "^3.4.4",
     "react": "^18",
