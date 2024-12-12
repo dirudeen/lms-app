@@ -1,6 +1,6 @@
 "use server";
 import { db } from "@/db";
-import { course as courseTable } from "@/db/schema/schmas";
+import { category, course as courseTable } from "@/db/schema/schmas";
 import { auth } from "@clerk/nextjs/server";
 import { insertCourseSchema } from "@/db/schema/schmas";
 import { eq, and } from "drizzle-orm";
@@ -88,4 +88,23 @@ export async function updateCourse({
     console.log(["UPDATE COURSE", error]);
     throw new Error("Failed to update the course");
   }
+}
+
+export const fetchCategories = async () => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("Unautherized");
+  }
+
+  try {
+    const categories = await db
+    .select()
+    .from(category)
+    .then((res) => res);
+  return categories;
+} catch (error) {
+  console.log(["GET CATEGORIES", error]);
+  throw new Error("Failed to get categories");
+}
+
 }

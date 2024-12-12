@@ -1,9 +1,10 @@
-import { fetchCourse } from "@/actions/course";
+import { fetchCategories, fetchCourse } from "@/actions/course";
 import { IconBadge } from "@/components/IconBadge";
 import { LayoutDashboard } from "lucide-react";
 import { TitleForm } from "./_components/TitleForm";
 import { DescriptionForm } from "./_components/DescriptionForm";
 import { ImageForm } from "./_components/ImageForm";
+import { CategoryForm } from "./_components/CategoryForm";
 
 interface Props {
   params: {
@@ -13,6 +14,11 @@ interface Props {
 
 export default async function CoursePage({ params: { courseId } }: Props) {
   const course = await fetchCourse(courseId);
+  const categories = await fetchCategories();
+  const transformedCategories = categories.map((category) => ({
+    label: category.name,
+    value: category.id,
+  }));
 
   // fields to complete
   const requiredFields = [
@@ -45,6 +51,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           <TitleForm initialData={course} courseId={course.id} />
           <DescriptionForm initialData={course} courseId={course.id} />
           <ImageForm courseId={course.id} initialData={course} />
+          <CategoryForm courseId={course.id} initialData={course} options={transformedCategories}/>
         </div>
       </div>
     </div>

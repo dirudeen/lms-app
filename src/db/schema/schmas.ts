@@ -37,5 +37,7 @@ export const attachment = pgTable("Attachment", {
 export const insertCourseSchema = createInsertSchema(course, {
   title: z.string().min(1, {message: "Title must be at least 3 characters"}),
   userId: z.string(),
-  description: z.string().optional()
+  description: z.string().min(1, {message: "Description is required"}),
+  imageUrl: z.string().min(1, {message: "Image url is required"}),
+  categoryId: z.string().min(1, {message: "Category field is required"}),
 })
