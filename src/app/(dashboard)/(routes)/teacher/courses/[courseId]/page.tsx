@@ -1,10 +1,17 @@
 import { fetchCategories, fetchCourse } from "@/actions/course";
 import { IconBadge } from "@/components/IconBadge";
-import { LayoutDashboard } from "lucide-react";
+import {
+  CheckCircleIcon,
+  CircleDollarSign,
+  DollarSign,
+  LayoutDashboard,
+  ListChecks,
+} from "lucide-react";
 import { TitleForm } from "./_components/TitleForm";
 import { DescriptionForm } from "./_components/DescriptionForm";
 import { ImageForm } from "./_components/ImageForm";
 import { CategoryForm } from "./_components/CategoryForm";
+import { PriceForm } from "./_components/PriceForm";
 
 interface Props {
   params: {
@@ -41,8 +48,8 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 mt-16">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-x-4">
+        <section>
           <div className="flex items-center gap-x-2">
             <IconBadge icon={LayoutDashboard} />
             <h2 className="text-xl">Customize your course</h2>
@@ -51,7 +58,27 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           <TitleForm initialData={course} courseId={course.id} />
           <DescriptionForm initialData={course} courseId={course.id} />
           <ImageForm courseId={course.id} initialData={course} />
-          <CategoryForm courseId={course.id} initialData={course} options={transformedCategories}/>
+          <CategoryForm
+            courseId={course.id}
+            initialData={course}
+            options={transformedCategories}
+          />
+        </section>
+        <div className="space-y-4">
+          <section>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={ListChecks} />
+              <h2 className="text-xl">Course chapers</h2>
+            </div>
+            <div>TODO: Chapters</div>
+          </section>
+          <section>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={CircleDollarSign} />
+              <h2 className="text-xl">Sell your course</h2>
+            </div>
+            <PriceForm courseId={course.id} initialData={course} />
+          </section>
         </div>
       </div>
     </div>

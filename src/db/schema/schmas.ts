@@ -40,4 +40,5 @@ export const insertCourseSchema = createInsertSchema(course, {
   description: z.string().min(1, {message: "Description is required"}),
   imageUrl: z.string().min(1, {message: "Image url is required"}),
   categoryId: z.string().min(1, {message: "Category field is required"}),
+  price: z.string()
 })

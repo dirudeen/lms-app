@@ -45,10 +45,10 @@ export async function fetchCourse(courseId: string) {
       .from(courseTable)
       .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)))
       .then((res) => res[0]);
-
-    if (!course) {
-      redirect("/");
-    }
+      if (!course) {
+        redirect("/");
+      }
+     
     return course;
   } catch (error) {
     console.log(["GET COURSES", error]);

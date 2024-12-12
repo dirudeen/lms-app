@@ -6,6 +6,7 @@ export const titleInputValidation = insertCourseSchema.pick({title: true})
 export const descriptionInputValidation = insertCourseSchema.pick({description: true})
 export const imageUrlInputValidation = insertCourseSchema.pick({imageUrl: true,})
 export const categoryInputValidation = insertCourseSchema.pick({categoryId: true})
+export const priceInputValidation = insertCourseSchema.pick({price: true})
 
 const updateCourse = insertCourseSchema.omit({userId: true})
 export type Course = z.infer<typeof updateCourse>
