@@ -1,35 +1,22 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ImageIcon, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ImageIcon, PlusCircle } from "lucide-react";
 
+import { updateCourse } from "@/actions/course";
+import { FileUpload } from "@/components/FileUpload";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import toast from "react-hot-toast";
-import {
   Course,
-  descriptionInputValidation,
-  imageUrlInputValidation,
+  imageUrlInputValidation
 } from "@/types";
 import { PencilIcon } from "lucide-react";
-import { Fragment, useState } from "react";
-import { usePathname } from "next/navigation";
-import { updateCourse } from "@/actions/course";
-import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
-import { Spinner } from "@/components/Spinner";
 import Image from "next/image";
-import { FileUpload } from "@/components/FileUpload";
+import { usePathname } from "next/navigation";
+import { Fragment, useState } from "react";
+import toast from "react-hot-toast";
 
 interface ImageFormProps {
   initialData: Course;
@@ -45,7 +32,6 @@ export function ImageForm({ initialData, courseId }: ImageFormProps) {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof imageUrlInputValidation>) => {
     try {
