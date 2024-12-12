@@ -43,7 +43,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           </div>
 
           <TitleForm initialData={course} courseId={course.id} />
-          {/* <DescriptionForm initialData={course} courseId={course.id} /> */}
+          <DescriptionForm initialData={course} courseId={course.id} />
           <ImageForm courseId={course.id} initialData={course} />
         </div>
       </div>
