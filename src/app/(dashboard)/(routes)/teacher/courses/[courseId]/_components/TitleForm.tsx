@@ -4,28 +4,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { updateCourse } from "@/actions/course";
+import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import toast from "react-hot-toast";
-import { titleInputValidation } from "@/types";
+import { Course, titleInputValidation } from "@/types";
 import { PencilIcon } from "lucide-react";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { updateCourse } from "@/actions/course";
-import { Spinner } from "@/components/Spinner";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import FormCard from "./FormCard";
 
 interface TitleFormProps {
   initialData: {
-    title: string;
+    title: Course["title"]
   };
   courseId: string;
 }
@@ -53,7 +52,7 @@ export function TitleForm({ initialData, courseId }: TitleFormProps) {
     }
   };
   return (
-    <div className="bg-slate-100 p-4 mt-6 rounded-md border">
+    <FormCard>
       <div className="flex items-center justify-between font-medium">
         <p>Course title</p>
         <Button 
@@ -96,6 +95,6 @@ export function TitleForm({ initialData, courseId }: TitleFormProps) {
             </form>
           </Form>
         )}
-    </div>
+    </FormCard>
   );
 }

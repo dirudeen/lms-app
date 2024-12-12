@@ -23,6 +23,7 @@ import { updateCourse } from "@/actions/course";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/Spinner";
+import FormCard from "./FormCard";
 
 interface DescriptionFormProps {
   initialData: {
@@ -55,7 +56,7 @@ export function DescriptionForm({ initialData, courseId }: DescriptionFormProps)
     }
   };
   return (
-    <div className="bg-slate-100 p-4 mt-6 rounded-md border">
+    <FormCard>
       <div className="flex items-center justify-between font-medium">
         <p>Course description</p>
         <Button 
@@ -100,6 +101,6 @@ export function DescriptionForm({ initialData, courseId }: DescriptionFormProps)
             </form>
           </Form>
         )}
-    </div>
+    </FormCard>
   );
 }

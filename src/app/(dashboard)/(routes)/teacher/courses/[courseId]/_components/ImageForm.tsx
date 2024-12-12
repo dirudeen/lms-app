@@ -17,9 +17,12 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
+import FormCard from "./FormCard";
 
 interface ImageFormProps {
-  initialData: Course;
+  initialData: {
+    imageUrl: Course["imageUrl"]
+  };
   courseId: string;
 }
 
@@ -46,7 +49,7 @@ export function ImageForm({ initialData, courseId }: ImageFormProps) {
   };
 
   return (
-    <div className="bg-slate-100 p-4 mt-6 rounded-md border">
+    <FormCard>
       <div className="flex items-center justify-between font-medium">
         <p>Course Image</p>
         <Button
@@ -99,6 +102,6 @@ export function ImageForm({ initialData, courseId }: ImageFormProps) {
           <p className="text-sm text-muted-foreground mt-4">16:9 aspect ratio recommeded</p>
         </div>
         )} 
-    </div>
+    </FormCard>
   );
 }
