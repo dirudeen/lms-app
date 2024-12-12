@@ -26,18 +26,15 @@ import { Spinner } from "@/components/Spinner";
 
 interface DescriptionFormProps {
   initialData: {
-    description: string | undefined;
+    description: string | null;
   };
   courseId: string;
 }
-// const descriptionInputValidation = z.object({
-//   description: z.string().nullable()
-// })
 
 export function DescriptionForm({ initialData, courseId }: DescriptionFormProps) {
   const form = useForm({
     resolver: zodResolver(descriptionInputValidation),
-    defaultValues: initialData,
+    defaultValues: {description: initialData.description ? initialData.description : ""},
   });
   const pathname = usePathname();
 
