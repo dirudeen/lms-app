@@ -50,7 +50,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-x-4 outline-blue-800 outline">
+      <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-x-4">
         <section>
           <div className="flex items-center gap-x-2">
             <IconBadge icon={LayoutDashboard} />
