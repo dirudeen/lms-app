@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { text, pgTable, numeric, boolean, uuid, timestamp } from "drizzle-orm/pg-core";
-import {createInsertSchema} from "drizzle-zod"
+import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod";
 
 export const course = pgTable('Course', {
@@ -27,7 +27,8 @@ export const category = pgTable("Category", {
 export const attachment = pgTable("Attachment", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
     courseId: uuid("courseId").notNull().references(() => course.id, {onDelete: "cascade"}),
-    url: text("url"),
+    url: text("url").notNull(),
+    name: text("name").notNull(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().notNull()
 
