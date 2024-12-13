@@ -1,12 +1,19 @@
 "use server";
 import { db } from "@/db";
-import { category, course as courseTable } from "@/db/schema/schmas";
+import {
+  attachment as attachmentTable,
+  category,
+  course as courseTable,
+} from "@/db/schema/schmas";
 import { auth } from "@clerk/nextjs/server";
 import { insertCourseSchema } from "@/db/schema/schmas";
-import { eq, and } from "drizzle-orm";
+import { eq, and, asc, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Course } from "@/types";
+
+type CourseSelect = typeof courseTable.$inferSelect;
+type Attachment = typeof attachmentTable.$inferSelect;
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -40,16 +47,34 @@ export async function fetchCourse(courseId: string) {
   }
 
   try {
-    const course = await db
+    const rows = await db
       .select()
       .from(courseTable)
-      .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)))
-      .then((res) => res[0]);
-      if (!course) {
-        redirect("/");
-      }
-     
-    return course;
+      .leftJoin(attachmentTable, eq(courseTable.id, attachmentTable.courseId))
+      .orderBy(desc(attachmentTable.createdAt))
+      .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)));
+
+    const result = rows.reduce<{
+      course: CourseSelect;
+      attachments: Attachment[];
+    }>(
+      (acc, row) => {
+        if (!acc.course) {
+          acc.course = row.Course;
+          acc.attachments = [];
+        }
+        if (row.Attachment) {
+          acc.attachments.push(row.Attachment);
+        }
+        return acc;
+      },
+      { course: rows[0]?.Course || null, attachments: [] }
+    );
+
+    if (!result.course) {
+      redirect("/");
+    }
+    return result;
   } catch (error) {
     console.log(["GET COURSES", error]);
     throw new Error("Failed to get courses");
@@ -58,8 +83,8 @@ export async function fetchCourse(courseId: string) {
 
 interface UpdateCourseProps {
   values: {
-    [key in keyof Course]?: Course[key]
-  }
+    [key in keyof Course]?: Course[key];
+  };
   courseId: string;
   path: string;
 }
@@ -81,8 +106,7 @@ export async function updateCourse({
       .returning()
       .then((res) => res[0]);
     revalidatePath(path);
-
-    console.log(updatedCourse);
+    
     return updatedCourse;
   } catch (error) {
     console.log(["UPDATE COURSE", error]);
@@ -98,13 +122,13 @@ export const fetchCategories = async () => {
 
   try {
     const categories = await db
-    .select()
-    .from(category)
-    .then((res) => res);
-  return categories;
-} catch (error) {
-  console.log(["GET CATEGORIES", error]);
-  throw new Error("Failed to get categories");
-}
-
-}
+      .select()
+      .from(category)
+      .orderBy(asc(category.name))
+      .then((res) => res);
+    return categories;
+  } catch (error) {
+    console.log(["GET CATEGORIES", error]);
+    throw new Error("Failed to get categories");
+  }
+};
