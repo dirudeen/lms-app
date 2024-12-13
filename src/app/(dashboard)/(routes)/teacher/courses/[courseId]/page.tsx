@@ -4,6 +4,7 @@ import {
   CheckCircleIcon,
   CircleDollarSign,
   DollarSign,
+  File,
   LayoutDashboard,
   ListChecks,
 } from "lucide-react";
@@ -12,6 +13,7 @@ import { DescriptionForm } from "./_components/DescriptionForm";
 import { ImageForm } from "./_components/ImageForm";
 import { CategoryForm } from "./_components/CategoryForm";
 import { PriceForm } from "./_components/PriceForm";
+import { AttachmentForm } from "./_components/AttachmentForm";
 
 interface Props {
   params: {
@@ -20,7 +22,7 @@ interface Props {
 }
 
 export default async function CoursePage({ params: { courseId } }: Props) {
-  const course = await fetchCourse(courseId);
+  const {course, attachments} = await fetchCourse(courseId);
   const categories = await fetchCategories();
   const transformedCategories = categories.map((category) => ({
     label: category.name,
@@ -48,13 +50,12 @@ export default async function CoursePage({ params: { courseId } }: Props) {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-x-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-x-4 outline-blue-800 outline">
         <section>
           <div className="flex items-center gap-x-2">
             <IconBadge icon={LayoutDashboard} />
             <h2 className="text-xl">Customize your course</h2>
           </div>
-
           <TitleForm initialData={course} courseId={course.id} />
           <DescriptionForm initialData={course} courseId={course.id} />
           <ImageForm courseId={course.id} initialData={course} />
@@ -78,6 +79,16 @@ export default async function CoursePage({ params: { courseId } }: Props) {
               <h2 className="text-xl">Sell your course</h2>
             </div>
             <PriceForm courseId={course.id} initialData={course} />
+          </section>
+          <section>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={File} />
+              <h2 className="text-xl">Resources and Attachments</h2>
+            </div>
+            <AttachmentForm
+              initialData={{course, attachments}}
+              courseId={courseId}
+            />
           </section>
         </div>
       </div>
