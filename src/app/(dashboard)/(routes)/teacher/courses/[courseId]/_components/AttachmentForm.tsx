@@ -1,47 +1,37 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { File, ImageIcon, PlusCircle } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { File, Loader2, PlusCircle, Trash } from "lucide-react";
 import { z } from "zod";
 
-import { updateCourse } from "@/actions/course";
+import { createAttachment, deleteAttachment } from "@/actions/attachment";
 import { FileUpload } from "@/components/FileUpload";
 import { Button } from "@/components/ui/button";
-import {
-  Course,
-  imageUrlInputValidation
-} from "@/types";
-import { PencilIcon } from "lucide-react";
-import Image from "next/image";
+import { Attachment, Course } from "@/types";
 import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import FormCard from "./FormCard";
-import { Attachment } from "@/types";
-import { createAttachment } from "@/actions/attachment";
 
 interface AttachmentFormProps {
   initialData: {
-    course: Course,
-    attachments: Attachment[]
+    course: Course;
+    attachments: Attachment[];
   };
   courseId: string;
 }
 
 const formSchema = z.object({
   url: z.string().min(1),
-  name: z.string().min(1)
-})
+  name: z.string().min(1),
+});
 
 export function AttachmentForm({ initialData, courseId }: AttachmentFormProps) {
-
   const pathname = usePathname();
-
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("it's here now")
+    console.log("it's here now");
     try {
       await createAttachment({ courseId, path: pathname, values });
       setIsEditing(false);
@@ -50,6 +40,26 @@ export function AttachmentForm({ initialData, courseId }: AttachmentFormProps) {
       if (error instanceof Error) {
         toast.error(error.message);
       }
+    }
+  };
+
+  const handleDelete = async (id: string, url: string) => {
+    setIsDeleting(id);
+    try {
+      await deleteAttachment({
+        attachmentId: id,
+        courseId,
+        path: pathname,
+        url,
+      });
+
+      toast.success("Attachment deleted");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -73,32 +83,57 @@ export function AttachmentForm({ initialData, courseId }: AttachmentFormProps) {
       </div>
       {!isEditing && (
         <>
-        {initialData.attachments.length === 0 && <p className="text-sm mt-2 text-slate-500 italic">No attachments yet</p>}
-        {initialData.attachments.length > 0 &&
-        <div>
-          {initialData.attachments.map((attachment) => (
-            <div key={attachment.id} className="flex justify-center items-center h-40 rounded-md bg-slate-200 mt-2">
-              <File />
-              <p className="text-sm text-muted-foreground mt-4">{attachment.name}</p>
+          {initialData.attachments.length === 0 && (
+            <p className="text-sm mt-2 text-slate-500 italic">
+              No attachments yet
+            </p>
+          )}
+          {initialData.attachments.length > 0 && (
+            <div className="space-y-1.5">
+              {initialData.attachments.map((attachment) => (
+                <div
+                  key={attachment.id}
+                  className="flex justify-between items-center p-2 w-full bg-sky-100 border border-sky-200 text-sky-700 rounded-md"
+                >
+                  <div className="gap-x-2 flex items-center">
+                    <File className="size-4 flex-shrink-0" />
+                    <p className="truncate max-w-72">{attachment.name}</p>
+                  </div>
+                  <Button
+                    size={"sm"}
+                    variant={"destructive"}
+                    onClick={() => handleDelete(attachment.id, attachment.url)}
+                    disabled={isDeleting === attachment.id}
+                  >
+                    {isDeleting === attachment.id && (
+                      <Loader2 className="ml-auto size-4 animate-spin" />
+                    )}
+                    {isDeleting !== attachment.id && (
+                      <Trash className="size-4" />
+                    )}
+                  </Button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>} 
-       </>   
+          )}
+        </>
       )}
 
       {isEditing && (
         <div>
           <FileUpload
-          endpoint="courseAttachments"
-          onchange={(url, name) => {
-            if(url && name){
-              onSubmit({url: url, name: name})
-            }
-          }}
+            endpoint="courseAttachments"
+            onchange={(url, name) => {
+              if (url && name) {
+                onSubmit({ url: url, name: name });
+              }
+            }}
           />
-          <p className="text-sm text-muted-foreground mt-4">Add anything your students might need to complete the course</p>
+          <p className="text-sm text-muted-foreground mt-4">
+            Add anything your students might need to complete the course
+          </p>
         </div>
-        )} 
+      )}
     </FormCard>
   );
 }
