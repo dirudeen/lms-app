@@ -1,12 +1,12 @@
 "use server";
 import { db } from "@/db";
 import {
-  attachment as attachmentTable,
-  category,
-  course as courseTable,
-} from "@/db/schema/schmas";
+attachmentTable,
+categoryTable,
+courseTable,
+} from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { insertCourseSchema } from "@/db/schema/schmas";
+import { insertCourseSchema } from "@/types/index";
 import { eq, and, asc, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -123,8 +123,8 @@ export const fetchCategories = async () => {
   try {
     const categories = await db
       .select()
-      .from(category)
-      .orderBy(asc(category.name))
+      .from(categoryTable)
+      .orderBy(asc(categoryTable.name))
       .then((res) => res);
     return categories;
   } catch (error) {

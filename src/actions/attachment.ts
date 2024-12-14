@@ -4,9 +4,9 @@ import { auth } from "@clerk/nextjs/server";
 
 import { db } from "@/db";
 import {
-    attachment as attachmentTable,
-    course as courseTable
-} from "@/db/schema/schmas";
+attachmentTable,
+courseTable
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { deleteUTFile } from "./uploadthing-action";

@@ -1,1 +1,0 @@
-ALTER TABLE "Course" ALTER COLUMN "categoryId" DROP NOT NULL;

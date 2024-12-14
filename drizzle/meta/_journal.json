@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1717455214944,
-      "tag": "0000_public_shaman",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1719333028234,
-      "tag": "0001_ordinary_marten_broadcloak",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1734107589286,
-      "tag": "0002_broken_magik",
+      "when": 1734190411828,
+      "tag": "0000_fat_chimera",
       "breakpoints": true
     }
   ]
