@@ -3,6 +3,7 @@ import { db } from "@/db";
 import {
 attachmentTable,
 categoryTable,
+chapterTable,
 courseTable,
 } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
@@ -14,6 +15,7 @@ import { Course } from "@/types";
 
 type CourseSelect = typeof courseTable.$inferSelect;
 type Attachment = typeof attachmentTable.$inferSelect;
+type Chapters = typeof chapterTable.$inferSelect;
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -51,29 +53,38 @@ export async function fetchCourse(courseId: string) {
       .select()
       .from(courseTable)
       .leftJoin(attachmentTable, eq(courseTable.id, attachmentTable.courseId))
+      .leftJoin(chapterTable, eq(chapterTable.courseId, courseId))
       .orderBy(desc(attachmentTable.createdAt))
       .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)));
 
     const result = rows.reduce<{
       course: CourseSelect;
       attachments: Attachment[];
+      chapters: Chapters[];
     }>(
       (acc, row) => {
         if (!acc.course) {
           acc.course = row.Course;
           acc.attachments = [];
+          acc.chapters = [];
         }
         if (row.Attachment) {
           acc.attachments.push(row.Attachment);
         }
+
+        if(row.Chapter) {
+          acc.chapters.push(row.Chapter)
+        }
+
         return acc;
       },
-      { course: rows[0]?.Course || null, attachments: [] }
+      { course: rows[0]?.Course || null, attachments: [], chapters: [] }
     );
 
     if (!result.course) {
       redirect("/");
     }
+    console.log(result)
     return result;
   } catch (error) {
     console.log(["GET COURSES", error]);
