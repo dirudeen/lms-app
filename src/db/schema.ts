@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { boolean, index, integer, numeric, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { timestampObj } from "./pgTableHelpers";
 
@@ -18,6 +18,11 @@ export const courseTable = pgTable('Course', {
         courseTableIdx: index("course_table_idx").on(table.id)
     }
 });
+
+export const courseRelations = relations(courseTable, ({many}) => ({
+    attachments: many(attachmentTable), 
+    chapters: many(chapterTable),
+}))
 
 export const categoryTable = pgTable("Category", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -42,6 +47,13 @@ export const attachmentTable = pgTable("Attachment", {
     }
 })
 
+export const attachmentRelations = relations(attachmentTable, ({one}) => ({
+    course: one(courseTable,{
+        fields: [attachmentTable.courseId],
+        references: [courseTable.id]
+    })
+}))
+
 export const chapterTable = pgTable("Chapter", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
     title: varchar("title", {length: 255}).notNull(),
@@ -57,6 +69,13 @@ export const chapterTable = pgTable("Chapter", {
         chapterTableCourseIdx: index("chapter_table_course_idx").on(table.courseId)
     }
 })
+
+export const chapterRelations = relations(chapterTable, ({one}) => ({
+    course: one(courseTable, {
+        fields: [chapterTable.courseId],
+        references: [courseTable.id]
+    })
+}))
 
 export const muxDataTable = pgTable("MuxData", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
