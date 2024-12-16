@@ -13,9 +13,6 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Course } from "@/types";
 
-type CourseSelect = typeof courseTable.$inferSelect;
-type Attachment = typeof attachmentTable.$inferSelect;
-type Chapters = typeof chapterTable.$inferSelect;
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -49,43 +46,20 @@ export async function fetchCourse(courseId: string) {
   }
 
   try {
-    const rows = await db
-      .select()
-      .from(courseTable)
-      .leftJoin(attachmentTable, eq(courseTable.id, attachmentTable.courseId))
-      .leftJoin(chapterTable, eq(chapterTable.courseId, courseId))
-      .orderBy(desc(attachmentTable.createdAt))
-      .where(and(eq(courseTable.userId, userId), eq(courseTable.id, courseId)));
+     const course = await db.query.courseTable.findFirst({
+          with: {
+              attachments: true,
+              chapters: true,
+          },
+          where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
+          orderBy: desc(attachmentTable.createdAt)
+      })
 
-    const result = rows.reduce<{
-      course: CourseSelect;
-      attachments: Attachment[];
-      chapters: Chapters[];
-    }>(
-      (acc, row) => {
-        if (!acc.course) {
-          acc.course = row.Course;
-          acc.attachments = [];
-          acc.chapters = [];
-        }
-        if (row.Attachment) {
-          acc.attachments.push(row.Attachment);
-        }
-
-        if(row.Chapter) {
-          acc.chapters.push(row.Chapter)
-        }
-
-        return acc;
-      },
-      { course: rows[0]?.Course || null, attachments: [], chapters: [] }
-    );
-
-    if (!result.course) {
-      redirect("/");
-    }
-    console.log(result)
-    return result;
+      if(!course){
+        redirect("/")
+      }
+      console.log(course)
+      return course
   } catch (error) {
     console.log(["GET COURSES", error]);
     throw new Error("Failed to get courses");
