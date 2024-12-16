@@ -1,5 +1,6 @@
 import {
  attachmentTable,
+ chapterTable,
  courseTable,
 } from "@/db/schema";
 import { createInsertSchema,  } from "drizzle-zod";
@@ -29,6 +30,10 @@ export const categoryInputValidation = insertCourseSchema.pick({
 export const priceInputValidation = insertCourseSchema.pick({ price: true });
 
 export type Course = typeof courseTable.$inferSelect;
-
-// attachment select type
 export type Attachment = typeof attachmentTable.$inferSelect;
+export type Chapters = typeof chapterTable.$inferSelect;
+export const chapterInsertSchema =  createInsertSchema(chapterTable, {
+  title: z.string().min(3, {message: "Title must be at least 3 characters"})
+})
+
+
