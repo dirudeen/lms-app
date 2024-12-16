@@ -14,6 +14,7 @@ import { ImageForm } from "./_components/ImageForm";
 import { CategoryForm } from "./_components/CategoryForm";
 import { PriceForm } from "./_components/PriceForm";
 import { AttachmentForm } from "./_components/AttachmentForm";
+import { ChaptersForm } from "./_components/ChaptersForm";
 
 interface Props {
   params: {
@@ -35,6 +36,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
     course.description,
     course.imageUrl,
     course.categoryId,
+    course.chapters.some(chapter => chapter.isPublished)
   ];
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter(Boolean).length;
@@ -71,7 +73,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
               <IconBadge icon={ListChecks} />
               <h2 className="text-xl">Course chapers</h2>
             </div>
-            <div>TODO: Chapters</div>
+            <ChaptersForm initialData={course} courseId={course.id} />
           </section>
           <section>
             <div className="flex items-center gap-x-2">
