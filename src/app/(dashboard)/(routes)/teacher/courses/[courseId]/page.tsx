@@ -22,7 +22,7 @@ interface Props {
 }
 
 export default async function CoursePage({ params: { courseId } }: Props) {
-  const {course, attachments} = await fetchCourse(courseId);
+  const course = await fetchCourse(courseId);
   const categories = await fetchCategories();
   const transformedCategories = categories.map((category) => ({
     label: category.name,
@@ -86,7 +86,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
               <h2 className="text-xl">Resources and Attachments</h2>
             </div>
             <AttachmentForm
-              initialData={{course, attachments}}
+              initialData={course}
               courseId={courseId}
             />
           </section>

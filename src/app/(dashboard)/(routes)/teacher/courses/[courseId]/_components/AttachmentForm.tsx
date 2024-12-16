@@ -13,10 +13,7 @@ import toast from "react-hot-toast";
 import FormCard from "./FormCard";
 
 interface AttachmentFormProps {
-  initialData: {
-    course: Course;
-    attachments: Attachment[];
-  };
+  initialData: { attachments: Attachment[] };
   courseId: string;
 }
 
