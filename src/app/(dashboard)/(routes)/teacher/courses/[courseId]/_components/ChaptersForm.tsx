@@ -22,7 +22,7 @@ import {
 } from "@/types";
 import { Loader2, Loader2Icon, PencilIcon, PlusCircleIcon } from "lucide-react";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { updateCourse } from "@/actions/course";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +45,7 @@ export function ChaptersForm({ initialData, courseId }: ChaptersFormProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "" },
@@ -80,6 +81,10 @@ export function ChaptersForm({ initialData, courseId }: ChaptersFormProps) {
       setIsUpdating(false);
     }
   };
+
+  const onEdit = (id: string) => {
+    router.push(`teacher/courses/${courseId}/chapters/${id}`);
+  }
 
   return (
     <FormCard className="relative">
@@ -152,7 +157,7 @@ export function ChaptersForm({ initialData, courseId }: ChaptersFormProps) {
           {initialData.chapters.length > 0 && (
             <ChaptersList
               onReoder={onReoder}
-              onEdit={() => {}}
+              onEdit={onEdit}
               items={initialData.chapters}
             />
           )}
