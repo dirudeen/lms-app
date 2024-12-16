@@ -24,7 +24,6 @@ export async function createCourse({ title }: { title: string }) {
     title,
     userId,
   });
-  console.log({ title, userId });
   try {
     const course = await db
       .insert(courseTable)
@@ -58,7 +57,6 @@ export async function fetchCourse(courseId: string) {
       if(!course){
         redirect("/")
       }
-      console.log(course)
       return course
   } catch (error) {
     console.log(["GET COURSES", error]);
