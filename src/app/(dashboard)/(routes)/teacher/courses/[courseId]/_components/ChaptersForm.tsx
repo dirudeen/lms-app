@@ -17,7 +17,7 @@ import {
 import toast from "react-hot-toast";
 import {
   chapterInsertSchema,
-  Chapters,
+  Chapter,
   descriptionInputValidation,
 } from "@/types";
 import { PencilIcon, PlusCircleIcon } from "lucide-react";
@@ -30,10 +30,11 @@ import { Spinner } from "@/components/Spinner";
 import FormCard from "./FormCard";
 import { Input } from "@/components/ui/input";
 import { createChapter } from "@/actions/chapters";
+import ChaptersListItem from "./ChaptersListItem";
 
 interface ChaptersFormProps {
   initialData: {
-    chapters: Chapters[];
+    chapters: Chapter[];
   };
   courseId: string;
 }

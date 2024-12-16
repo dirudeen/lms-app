@@ -31,7 +31,7 @@ export const priceInputValidation = insertCourseSchema.pick({ price: true });
 
 export type Course = typeof courseTable.$inferSelect;
 export type Attachment = typeof attachmentTable.$inferSelect;
-export type Chapters = typeof chapterTable.$inferSelect;
+export type Chapter = typeof chapterTable.$inferSelect;
 export const chapterInsertSchema =  createInsertSchema(chapterTable, {
   title: z.string().min(3, {message: "Title must be at least 3 characters"})
 })
