@@ -20,7 +20,7 @@ import {
   Chapter,
   descriptionInputValidation,
 } from "@/types";
-import { PencilIcon, PlusCircleIcon } from "lucide-react";
+import { Loader2, Loader2Icon, PencilIcon, PlusCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { updateCourse } from "@/actions/course";
@@ -29,8 +29,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/Spinner";
 import FormCard from "./FormCard";
 import { Input } from "@/components/ui/input";
-import { createChapter } from "@/actions/chapters";
-import ChaptersListItem from "./ChaptersListItem";
+import { createChapter, updateChaptersOrder } from "@/actions/chapters";
+import ChaptersList from "./ChaptersList";
 
 interface ChaptersFormProps {
   initialData: {
@@ -53,17 +53,41 @@ export function ChaptersForm({ initialData, courseId }: ChaptersFormProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await createChapter({courseId, path: pathname, values})
+      await createChapter({ courseId, path: pathname, values });
       setIsCreating((prev) => !prev);
       toast.success("Course chpater created");
+      form.reset();
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
       }
     }
   };
+
+  const onReoder = async (updateData: { id: string; position: number }[]) => {
+    try {
+      setIsUpdating(true);
+      await updateChaptersOrder({
+        items: updateData,
+        courseId
+      });
+      toast.success("Chapters reordered");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
-    <FormCard>
+    <FormCard className="relative">
+      {isUpdating && (
+        <div className="absolute size-full top-0 right-0 flex justify-center items-center bg-slate-500/20 rounded-md">
+          <Loader2Icon className="size-6 text-sky-700 animate-spin" />
+        </div>
+      )}
       <div className="flex items-center justify-between font-medium">
         <p>Course chapers</p>
         <Button
@@ -91,7 +115,7 @@ export function ChaptersForm({ initialData, courseId }: ChaptersFormProps) {
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g. This course is about..."
+                      placeholder="Chapter Title, e.g. Introduction"
                       {...field}
                     />
                   </FormControl>
@@ -124,6 +148,13 @@ export function ChaptersForm({ initialData, courseId }: ChaptersFormProps) {
             >
               No chapers
             </p>
+          )}
+          {initialData.chapters.length > 0 && (
+            <ChaptersList
+              onReoder={onReoder}
+              onEdit={() => {}}
+              items={initialData.chapters}
+            />
           )}
         </div>
       )}
