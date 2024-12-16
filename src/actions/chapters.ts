@@ -49,7 +49,7 @@ export async function createChapter({
       .orderBy(desc(chapterTable.position))
       .then((res) => res[0]);
 
-    const newPosition = lastChapter ? lastChapter.position + 1 : 1;
+    const newPosition = lastChapter ? lastChapter.position + 1 : 0;
 
     // insert the new chapter
     await db.insert(chapterTable).values({
@@ -62,4 +62,37 @@ export async function createChapter({
     console.log("CREATE CHAPTER", error);
     throw new Error("Failed to create a chapter");
   }
+}
+
+interface UpdateChaptersOrderProps {
+  items: {id: string, position: number}[]
+  courseId: string
+}
+
+export async function updateChaptersOrder({items, courseId}: UpdateChaptersOrderProps ) {
+
+  const {userId} = auth()
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const course = await db
+    .select()
+    .from(courseTable)
+    .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)))
+    .then((res) => res[0]);
+  if (!course) {
+    throw new Error("Unautherized");
+  }
+  // update all the chapters position
+  for (const item of items) {
+    await db.update(chapterTable).set({position: item.position}).where(eq(chapterTable.id, item.id))
+  }
+  } catch (error) {
+    console.log("UPDATE CHAPTERS ORDER", error);
+    throw new Error("Failed to update the chapter order");
+  }
+
 }
