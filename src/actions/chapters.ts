@@ -108,10 +108,7 @@ interface FetchChapterProps {
   chapterId: string;
 }
 
-export async function fetchChapter({
-  courseId,
-  chapterId,
-}: FetchChapterProps) {
+export async function fetchChapter({ courseId, chapterId }: FetchChapterProps) {
   const { userId } = auth();
 
   if (!userId) throw new Error("Unauthorized");
