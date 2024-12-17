@@ -70,11 +70,12 @@ export const chapterTable = pgTable("Chapter", {
     }
 })
 
-export const chapterRelations = relations(chapterTable, ({one}) => ({
+export const chapterRelations = relations(chapterTable, ({one, many}) => ({
     course: one(courseTable, {
         fields: [chapterTable.courseId],
         references: [courseTable.id]
-    })
+    }),
+    muxData: many(muxDataTable)
 }))
 
 export const muxDataTable = pgTable("MuxData", {
@@ -83,6 +84,13 @@ export const muxDataTable = pgTable("MuxData", {
   playbackId: varchar("playback_id", {length: 255}),
   chapterId: uuid("chapter_id").notNull().unique().references(() => chapterTable.id, {onDelete: "cascade"}),
 });
+
+export const muxDataRelations = relations(muxDataTable, ({one, many}) => ({
+    chapter: one(chapterTable, {
+        fields: [muxDataTable.chapterId],
+        references: [chapterTable.id],
+    })
+}))
 
 export const userProgressTable = pgTable("UserProgress", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
