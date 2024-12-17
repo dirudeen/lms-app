@@ -2,9 +2,11 @@
 
 import { db } from "@/db";
 import { chapterTable, courseTable } from "@/db/schema";
+import { Chapter } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import * as z from "zod";
 
 interface CreateChapterProps {
@@ -65,13 +67,15 @@ export async function createChapter({
 }
 
 interface UpdateChaptersOrderProps {
-  items: {id: string, position: number}[]
-  courseId: string
+  items: { id: string; position: number }[];
+  courseId: string;
 }
 
-export async function updateChaptersOrder({items, courseId}: UpdateChaptersOrderProps ) {
-
-  const {userId} = auth()
+export async function updateChaptersOrder({
+  items,
+  courseId,
+}: UpdateChaptersOrderProps) {
+  const { userId } = auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
