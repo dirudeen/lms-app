@@ -33,7 +33,8 @@ export type Course = typeof courseTable.$inferSelect;
 export type Attachment = typeof attachmentTable.$inferSelect;
 export type Chapter = typeof chapterTable.$inferSelect;
 export const chapterInsertSchema =  createInsertSchema(chapterTable, {
-  title: z.string().min(3, {message: "Title must be at least 3 characters"})
+  title: z.string().min(3, {message: "Title must be at least 3 characters"}),
+  description: z.string().min(1)
 })
 
 
