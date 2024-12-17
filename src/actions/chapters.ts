@@ -79,20 +79,99 @@ export async function updateChaptersOrder({items, courseId}: UpdateChaptersOrder
 
   try {
     const course = await db
-    .select()
-    .from(courseTable)
-    .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)))
-    .then((res) => res[0]);
-  if (!course) {
-    throw new Error("Unautherized");
-  }
-  // update all the chapters position
-  for (const item of items) {
-    await db.update(chapterTable).set({position: item.position}).where(eq(chapterTable.id, item.id))
-  }
+      .select()
+      .from(courseTable)
+      .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)))
+      .then((res) => res[0]);
+    if (!course) {
+      throw new Error("Unautherized");
+    }
+    // update all the chapters position
+    for (const item of items) {
+      await db
+        .update(chapterTable)
+        .set({ position: item.position })
+        .where(eq(chapterTable.id, item.id));
+    }
   } catch (error) {
     console.log("UPDATE CHAPTERS ORDER", error);
     throw new Error("Failed to update the chapter order");
   }
+}
 
+interface FetchChapterProps {
+  courseId: string;
+  chapterId: string;
+}
+
+export async function fetchChapter({
+  courseId,
+  chapterId,
+}: FetchChapterProps) {
+  const { userId } = auth();
+
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    // todo: create a relationship between chapter and muxdata table
+    const chapter = await db.query.chapterTable.findFirst({
+      with: { muxData: true },
+      where: and(
+        eq(chapterTable.id, chapterId),
+        eq(chapterTable.courseId, courseId)
+      ),
+    });
+
+    if (!chapter) redirect("/");
+    return chapter;
+  } catch (error) {
+    console.log("FETCH CHAPTERS", error);
+    throw new Error("Failed to fetch chapter");
+  }
+}
+
+interface UpdateChapterProps {
+  values: Partial<Chapter>;
+  chapterId: string;
+  courseId: string;
+  path: string;
+}
+
+export async function updateChapter({
+  values,
+  chapterId,
+  courseId,
+  path,
+}: UpdateChapterProps) {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("Unautherized");
+  }
+
+  // prevent client from updating the isPublished field
+  const { isPublished, ...rest } = values;
+
+  try {
+    const ownCourse = await db
+      .select()
+      .from(courseTable)
+      .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)))
+      .then((res) => res[0]);
+    if (!ownCourse) {
+      throw new Error("Unautherized");
+    }
+
+    await db
+      .update(chapterTable)
+      .set(rest)
+      .where(
+        and(eq(chapterTable.id, chapterId), eq(chapterTable.courseId, courseId))
+      );
+
+    revalidatePath(path);
+    return { success: true };
+  } catch (error) {
+    console.log("UPDATE CHAPTERS", error);
+    throw new Error("Failed to update the chapter");
+  }
 }
