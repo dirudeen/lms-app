@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import FormCard from "../../../_components/FormCard";
+import MuxPlayer from "@mux/mux-player-react";
 
 interface ChapterVideoFormProps {
   initialData: {
@@ -82,8 +83,10 @@ export function ChapterVideoForm({
           <Video className="size-10 text-slate-500" />
         </div>
       )}
-      {!isEditing && initialData.videoUrl && (
-        <div className="relative aspect-video mt-2">Vide uploaded</div>
+      {!isEditing && initialData.videoUrl && initialData.muxData && (
+        <div className="relative aspect-video mt-2">
+          <MuxPlayer playbackId={initialData.muxData.playbackId || ""} />
+        </div>
       )}
       {isEditing && (
         <div>
@@ -102,7 +105,8 @@ export function ChapterVideoForm({
       )}
       {initialData.videoUrl && !isEditing && (
         <div className="text-sm text-muted-foreground mt-4">
-          Videos can take a few minutes to process, Refresh the page if video does not appear.
+          Videos can take a few minutes to process, Refresh the page if video
+          does not appear.
         </div>
       )}
     </FormCard>
