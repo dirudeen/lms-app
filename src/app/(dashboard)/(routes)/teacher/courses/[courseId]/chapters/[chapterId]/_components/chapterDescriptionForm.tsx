@@ -54,7 +54,7 @@ export function ChapterDescriptionForm({
     try {
       await updateChapter({ courseId, chapterId, path: pathname, values });
       toast.success("Chapter description updated");
-      form.reset();
+      form.reset({ description: values.description || "" });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -88,8 +88,10 @@ export function ChapterDescriptionForm({
             !initialData.description && "text-slate-700 italic"
           )}
         >
-          {!initialData.description &&  <p>No chapter description yet</p>}
-          {initialData.description && <Preview value={initialData.description} />}
+          {!initialData.description && <p>No chapter description yet</p>}
+          {initialData.description && (
+            <Preview value={initialData.description} />
+          )}
         </div>
       )}
       {isEditing && (
