@@ -75,7 +75,7 @@ export const chapterRelations = relations(chapterTable, ({one, many}) => ({
         fields: [chapterTable.courseId],
         references: [courseTable.id]
     }),
-    muxData: many(muxDataTable)
+    muxData: one(muxDataTable)
 }))
 
 export const muxDataTable = pgTable("MuxData", {
