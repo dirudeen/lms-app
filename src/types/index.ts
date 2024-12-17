@@ -2,6 +2,7 @@ import {
  attachmentTable,
  chapterTable,
  courseTable,
+ muxDataTable,
 } from "@/db/schema";
 import { createInsertSchema,  } from "drizzle-zod";
 import * as z from "zod";
@@ -36,5 +37,5 @@ export const chapterInsertSchema =  createInsertSchema(chapterTable, {
   title: z.string().min(3, {message: "Title must be at least 3 characters"}),
   description: z.string().min(1)
 })
-
+export type MuxData = typeof muxDataTable.$inferSelect;
 
