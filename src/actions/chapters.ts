@@ -1,13 +1,14 @@
 "use server";
 
 import { db } from "@/db";
-import { chapterTable, courseTable } from "@/db/schema";
+import { chapterTable, courseTable, muxDataTable } from "@/db/schema";
 import { Chapter } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
+import Mux from "@mux/mux-node";
 
 interface CreateChapterProps {
   courseId: string;
@@ -131,6 +132,11 @@ export async function fetchChapter({ courseId, chapterId }: FetchChapterProps) {
   }
 }
 
+const { video } = new Mux({
+  tokenId: process.env.MUX_TOKEN_ID,
+  tokenSecret: process.env.MUX_TOKEN_SECRET,
+});
+
 interface UpdateChapterProps {
   values: Partial<Chapter>;
   chapterId: string;
@@ -168,6 +174,35 @@ export async function updateChapter({
       .where(
         and(eq(chapterTable.id, chapterId), eq(chapterTable.courseId, courseId))
       );
+
+    // Create a muxData entry if the videoUrl is provided
+    if (values.videoUrl) {
+      // delete any existing muxData related to the chapter
+      const existingMuxData = await db
+        .select()
+        .from(muxDataTable)
+        .where(eq(muxDataTable.chapterId, chapterId))
+        .then((res) => res[0]);
+
+      if (existingMuxData) {
+        await video.assets.delete(existingMuxData.assetId);
+        await db
+          .delete(muxDataTable)
+          .where(eq(muxDataTable.id, existingMuxData.id));
+      }
+
+      const assset = await video.assets.create({
+        input: [{ url: values.videoUrl }],
+        playback_policy: ["public"],
+        test: false,
+      });
+
+      await db.insert(muxDataTable).values({
+        assetId: assset.id,
+        chapterId: chapterId,
+        playbackId: assset.playback_ids?.[0].id,
+      });
+    }
 
     revalidatePath(path);
     return { success: true };
