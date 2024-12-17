@@ -22,6 +22,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import FormCard from "../../../_components/FormCard";
+import Editor from "@/components/editor";
+import Preview from "@/components/preview";
 
 interface ChapterDescriptionFormProps {
   initialData: {
@@ -80,14 +82,15 @@ export function ChapterDescriptionForm({
         </Button>
       </div>
       {!isEditing && (
-        <p
+        <div
           className={cn(
             "text-sm mt-2",
             !initialData.description && "text-slate-700 italic"
           )}
         >
-          {initialData.description || "No chapter description yet"}
-        </p>
+          {!initialData.description &&  <p>No chapter description yet</p>}
+          {initialData.description && <Preview value={initialData.description} />}
+        </div>
       )}
       {isEditing && (
         <Form {...form}>
@@ -98,10 +101,7 @@ export function ChapterDescriptionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Textarea
-                      placeholder="e.g. This chapter is about..."
-                      {...field}
-                    />
+                    <Editor value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
