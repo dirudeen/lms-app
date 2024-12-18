@@ -1,5 +1,5 @@
 "use client";
-import { deleteCourse } from "@/actions/course";
+import { deleteCourse, publishCourse, unPublishCourse } from "@/actions/course";
 import { ConfirmModal } from "@/components/modals/confirmModal";
 import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
@@ -29,13 +29,13 @@ export default function Actions({
     setIsLoading(true);
 
     try {
-      // if (isPublished) {
-      //   await unpublishCourse({ courseId, path });
-      //   toast.success("Course unpublished successfully");
-      // } else {
-      //   await publishCourse({ courseId, path });
-      //   toast.success("Course published successfully");
-      // }
+      if (isPublished) {
+        await unPublishCourse({ courseId, path });
+        toast.success("Course unpublished successfully");
+      } else {
+        await publishCourse({ courseId, path });
+        toast.success("Course published successfully");
+      }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -68,8 +68,7 @@ export default function Actions({
         disabled={disabled || isLoading || isDeleting}
         onClick={onClickHandler}
       >
-        {isPublished && !isLoading ? "Unpublish" : "Publish"}
-        {isLoading && <Spinner />}
+        {!isLoading ? isPublished ? "Unpublish" : "Publish" : <Spinner />}
       </Button>
       <ConfirmModal onConfirm={onDelete}>
         <Button
