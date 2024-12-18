@@ -16,6 +16,7 @@ import { PriceForm } from "./_components/PriceForm";
 import { AttachmentForm } from "./_components/AttachmentForm";
 import { ChaptersForm } from "./_components/ChaptersForm";
 import Banner from "@/components/banner";
+import Actions from "./_components/actions";
 
 interface Props {
   params: {
@@ -43,7 +44,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter(Boolean).length;
   const completionText = `${completedFields} / ${totalFields}`;
-
+  const isComplete = requiredFields.every(Boolean)
   return (
     <>
     {!course.isPublished && (
@@ -59,6 +60,11 @@ export default async function CoursePage({ params: { courseId } }: Props) {
             Complete all fields {completionText}
           </span>
         </div>
+        <Actions 
+          courseId={courseId}
+          disabled={!isComplete}
+          isPublished={course.isPublished}
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-x-4">
         <section>
