@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
 import Mux from "@mux/mux-node";
+import { deleteUTFile } from "./uploadthing-action";
 
 interface CreateChapterProps {
   courseId: string;
@@ -209,5 +210,80 @@ export async function updateChapter({
   } catch (error) {
     console.log("UPDATE CHAPTERS", error);
     throw new Error("Failed to update the chapter");
+  }
+}
+
+interface DeleteChapterProps {
+  chapterId: string;
+  courseId: string;
+}
+
+export async function deleteChapter({
+  chapterId,
+  courseId,
+}: DeleteChapterProps) {
+  const { userId } = auth();
+
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    // verify the user has access to the course
+
+    const ownCourse = await db
+      .select()
+      .from(courseTable)
+      .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)));
+
+    if (ownCourse.length === 0) throw new Error("Unauthorized");
+    // fetch chapter using the chapterId
+    const chaptersList = await db
+      .select()
+      .from(chapterTable)
+      .where(
+        and(eq(chapterTable.id, chapterId), eq(chapterTable.courseId, courseId))
+      );
+
+    if (chaptersList.length === 0) throw new Error("Chapter not found");
+    const chapter = chaptersList[0];
+
+    // if chapter has a videoUrl, delete the mux asset and muxData related to the chapter ...
+    // and delete asset in uploadthing.
+
+    if (chapter.videoUrl) {
+      const muxData = await db
+        .select()
+        .from(muxDataTable)
+        .where(eq(muxDataTable.chapterId, chapterId))
+        .then((res) => res[0]);
+
+      video.assets.delete(muxData.assetId);
+      await db.delete(muxDataTable).where(eq(muxDataTable.id, muxData.id));
+      await deleteUTFile(chapter.videoUrl);
+    }
+
+    // delete chapter from database
+    await db.delete(chapterTable).where(eq(chapterTable.id, chapterId));
+
+    // get all the chapters and check if any one of them is not published ...
+    // then update the status of the course to unpublished
+    const publishedChapters = await db
+      .select()
+      .from(chapterTable)
+      .where(
+        and(
+          eq(chapterTable.courseId, courseId),
+          eq(chapterTable.isPublished, true)
+        )
+      );
+
+    if (publishedChapters.length === 0) {
+      await db
+        .update(courseTable)
+        .set({ isPublished: false })
+        .where(eq(courseTable.id, courseId));
+    }
+  } catch (error) {
+    console.log("DELETE CHAPTER", error);
+    throw new Error("Failed to delete the chapter");
   }
 }
