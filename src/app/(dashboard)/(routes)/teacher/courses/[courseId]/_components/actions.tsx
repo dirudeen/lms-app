@@ -1,4 +1,5 @@
 "use client";
+import { deleteCourse } from "@/actions/course";
 import { ConfirmModal } from "@/components/modals/confirmModal";
 import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
@@ -30,10 +31,10 @@ export default function Actions({
     try {
       // if (isPublished) {
       //   await unpublishCourse({ courseId, path });
-      //   toast.success("Chapter unpublished successfully");
+      //   toast.success("Course unpublished successfully");
       // } else {
       //   await publishCourse({ courseId, path });
-      //   toast.success("Chapter published successfully");
+      //   toast.success("Course published successfully");
       // }
     } catch (error) {
       if (error instanceof Error) {
@@ -44,13 +45,13 @@ export default function Actions({
     }
   };
 
-  const onDeleteChapter = async () => {
+  const onDelete = async () => {
     setIsDeleting(true);
 
     try {
-      // await deleteCourse({ courseId });
-      // toast.success("Chapter deleted successfully");
-      // router.push(`/teacher/courses/`);
+      await deleteCourse({ courseId });
+      toast.success("Course deleted successfully");
+      router.push(`/teacher/courses/`);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -70,7 +71,7 @@ export default function Actions({
         {isPublished && !isLoading ? "Unpublish" : "Publish"}
         {isLoading && <Spinner />}
       </Button>
-      <ConfirmModal onConfirm={onDeleteChapter}>
+      <ConfirmModal onConfirm={onDelete}>
         <Button
           variant={"destructive"}
           size={"sm"}
