@@ -1,10 +1,10 @@
 "use server";
 import { db } from "@/db";
 import {
-attachmentTable,
-categoryTable,
-chapterTable,
-courseTable,
+  attachmentTable,
+  categoryTable,
+  chapterTable,
+  courseTable,
 } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { insertCourseSchema } from "@/types/index";
@@ -12,7 +12,8 @@ import { eq, and, asc, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Course } from "@/types";
-
+import Mux from "@mux/mux-node";
+import { deleteUTFile } from "./uploadthing-action";
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -45,19 +46,19 @@ export async function fetchCourse(courseId: string) {
   }
 
   try {
-     const course = await db.query.courseTable.findFirst({
-          with: {
-              attachments: true,
-              chapters: true,
-          },
-          where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
-          orderBy: desc(attachmentTable.createdAt)
-      })
+    const course = await db.query.courseTable.findFirst({
+      with: {
+        attachments: true,
+        chapters: true,
+      },
+      where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
+      orderBy: desc(attachmentTable.createdAt),
+    });
 
-      if(!course){
-        redirect("/")
-      }
-      return course
+    if (!course) {
+      redirect("/");
+    }
+    return course;
   } catch (error) {
     console.log(["GET COURSES", error]);
     throw new Error("Failed to get courses");
@@ -65,9 +66,7 @@ export async function fetchCourse(courseId: string) {
 }
 
 interface UpdateCourseProps {
-  values: {
-    [key in keyof Course]?: Course[key];
-  };
+  values: Partial<Course>;
   courseId: string;
   path: string;
 }
@@ -89,11 +88,49 @@ export async function updateCourse({
       .returning()
       .then((res) => res[0]);
     revalidatePath(path);
-    
+
     return updatedCourse;
   } catch (error) {
     console.log(["UPDATE COURSE", error]);
     throw new Error("Failed to update the course");
+  }
+}
+
+const { video } = new Mux({
+  tokenId: process.env.MUX_TOKEN_ID,
+  tokenSecret: process.env.MUX_TOKEN_SECRET,
+});
+
+interface DeleteCourseProps {
+  courseId: string;
+}
+
+export async function deleteCourse({ courseId }: DeleteCourseProps) {
+  try {
+    const { userId } = auth();
+    if (!userId) throw new Error("Unautherized");
+
+    const course = await db.query.courseTable.findFirst({
+      with: { chapters: { with: { muxData: true } } },
+      where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
+    });
+
+    if (!course) throw new Error("Course not found");
+
+    if (course.chapters.length !== 0) {
+      // delete the assets stored in mux and uploadthing
+      for (const chapter of course.chapters) {
+        if (chapter.videoUrl && chapter.muxData) {
+          await video.assets.delete(chapter.muxData.assetId);
+          await deleteUTFile(chapter.videoUrl);
+        }
+      }
+    }
+    // delete the course from the database
+    await db.delete(courseTable).where(eq(courseTable.id, courseId));
+  } catch (error) {
+    console.log("DELETE COURSE", error);
+    throw new Error("Failed to delete the course");
   }
 }
 
