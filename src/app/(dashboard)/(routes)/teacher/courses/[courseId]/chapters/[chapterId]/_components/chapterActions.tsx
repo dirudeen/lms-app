@@ -1,8 +1,8 @@
 "use client";
 import {
-    deleteChapter,
-    publishChapter,
-    unpublishChapter,
+  deleteChapter,
+  publishChapter,
+  unpublishChapter,
 } from "@/actions/chapters";
 import { ConfirmModal } from "@/components/modals/confirmModal";
 import { Spinner } from "@/components/Spinner";
@@ -74,8 +74,7 @@ export default function ChapterActions({
         disabled={disabled || isLoading || isDeleting}
         onClick={onClickHandler}
       >
-        {isPublished && !isLoading ? "Unpublish" : "Publish"}
-        {isLoading && <Spinner />}
+        {!isLoading ? isPublished ? "Unpublish" : "Publish" : <Spinner />}
       </Button>
       <ConfirmModal onConfirm={onDeleteChapter}>
         <Button
