@@ -10,7 +10,7 @@ export const courseTable = pgTable('Course', {
   description: text("description"),
   imageUrl: varchar("image_url"),
   price: numeric('price', {precision: 12, scale: 2}),
-  isPublished: boolean("is_published").default(false),
+  isPublished: boolean("is_published").default(false).notNull(),
   categoryId: uuid("category_id").references(() => categoryTable.id),
     ...timestampObj
 }, (table) => {
