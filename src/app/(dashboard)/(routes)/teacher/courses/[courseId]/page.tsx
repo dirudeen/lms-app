@@ -15,6 +15,7 @@ import { CategoryForm } from "./_components/CategoryForm";
 import { PriceForm } from "./_components/PriceForm";
 import { AttachmentForm } from "./_components/AttachmentForm";
 import { ChaptersForm } from "./_components/ChaptersForm";
+import Banner from "@/components/banner";
 
 interface Props {
   params: {
@@ -36,6 +37,7 @@ export default async function CoursePage({ params: { courseId } }: Props) {
     course.description,
     course.imageUrl,
     course.categoryId,
+    course.price,
     course.chapters.some(chapter => chapter.isPublished)
   ];
   const totalFields = requiredFields.length;
@@ -43,6 +45,12 @@ export default async function CoursePage({ params: { courseId } }: Props) {
   const completionText = `${completedFields} / ${totalFields}`;
 
   return (
+    <>
+    {!course.isPublished && (
+      <Banner 
+      label="This course is not published yet. It will not be visible to your students"
+      />
+    )}
     <div className="p-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-y-2">
@@ -95,5 +103,6 @@ export default async function CoursePage({ params: { courseId } }: Props) {
         </div>
       </div>
     </div>
+    </>
   );
 }
