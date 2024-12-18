@@ -287,3 +287,118 @@ export async function deleteChapter({
     throw new Error("Failed to delete the chapter");
   }
 }
+
+interface PublishChapterProps {
+  courseId: string;
+  chapterId: string;
+  path: string;
+}
+
+export async function publishChapter({
+  courseId,
+  chapterId,
+  path,
+}: PublishChapterProps) {
+  const { userId } = auth();
+
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    const ownCourse = await db
+      .select()
+      .from(courseTable)
+      .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)));
+
+    if (ownCourse.length === 0) throw new Error("Unauthorized");
+
+    const chaptersResult = await db
+      .select()
+      .from(chapterTable)
+      .where(
+        and(eq(chapterTable.id, chapterId), eq(chapterTable.courseId, courseId))
+      );
+
+    if (chaptersResult.length === 0) throw new Error("Chapter not found");
+
+    const chapter = chaptersResult[0];
+
+    const muxData = await db
+      .select()
+      .from(muxDataTable)
+      .where(eq(muxDataTable.chapterId, chapterId))
+      .then((result) => result[0]);
+
+    const requiredFieldsForPublishing = [
+      chapter.videoUrl,
+      chapter.description,
+      chapter.title,
+      muxData.id,
+    ];
+    const isReadyToPublish = requiredFieldsForPublishing.every(Boolean);
+    if (!isReadyToPublish)
+      throw new Error("Missing required fields for publishing");
+
+    await db
+      .update(chapterTable)
+      .set({ isPublished: true })
+      .where(eq(chapterTable.id, chapterId));
+    revalidatePath(path);
+  } catch (error) {
+    console.log("PUBLISH CHAPTER", error);
+    throw new Error("Failed to publish the chapter");
+  }
+}
+
+interface UnpublishChapterProps {
+  courseId: string;
+  chapterId: string;
+  path: string;
+}
+
+export async function unpublishChapter({
+  courseId,
+  chapterId,
+  path,
+}: UnpublishChapterProps) {
+  const { userId } = auth();
+
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    const ownCourse = await db
+      .select()
+      .from(courseTable)
+      .where(and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)));
+
+    if (ownCourse.length === 0) throw new Error("Unauthorized");
+
+    await db
+      .update(chapterTable)
+      .set({ isPublished: false })
+      .where(
+        and(eq(chapterTable.id, chapterId), eq(chapterTable.courseId, courseId))
+      );
+
+    const publishedChapters = await db
+      .select()
+      .from(chapterTable)
+      .where(
+        and(
+          eq(chapterTable.courseId, courseId),
+          eq(chapterTable.isPublished, true)
+        )
+      );
+
+    if (publishedChapters.length === 0) {
+      await db
+        .update(courseTable)
+        .set({ isPublished: false })
+        .where(eq(courseTable.id, courseId));
+    }
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log("UNPUBLISH CHAPTER", error);
+    throw new Error("Failed to unpublish the chapter");
+  }
+}
