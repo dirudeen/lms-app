@@ -3,6 +3,7 @@ import { deleteCourse, publishCourse, unPublishCourse } from "@/actions/course";
 import { ConfirmModal } from "@/components/modals/confirmModal";
 import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
+import { useConfettiStore } from "@/hooks/use-confetti-store";
 import { Trash } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -24,6 +25,8 @@ export default function Actions({
 
   const router = useRouter();
   const path = usePathname();
+  
+  const confetti = useConfettiStore()
 
   const onClickHandler = async () => {
     setIsLoading(true);
@@ -35,6 +38,7 @@ export default function Actions({
       } else {
         await publishCourse({ courseId, path });
         toast.success("Course published successfully");
+        confetti.onOpen()
       }
     } catch (error) {
       if (error instanceof Error) {
