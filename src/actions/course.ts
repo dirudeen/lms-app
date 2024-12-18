@@ -134,6 +134,81 @@ export async function deleteCourse({ courseId }: DeleteCourseProps) {
   }
 }
 
+interface PublishCourseProps {
+  courseId: string;
+  path: string;
+}
+
+export async function publishCourse({ courseId, path }: PublishCourseProps) {
+  try {
+    const { userId } = auth();
+    if (!userId) throw new Error("Unautherized");
+
+    const course = await db.query.courseTable.findFirst({
+      with: { chapters: true },
+      where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
+    });
+
+    if (!course) throw new Error("Course not found");
+
+    const hasPublishedChapters = course.chapters.some(
+      (chapter) => chapter.isPublished
+    );
+
+    const requiredFields = [
+      course.title,
+      course.description,
+      course.imageUrl,
+      course.categoryId,
+      course.price,
+      hasPublishedChapters,
+    ];
+
+    const requiredFieldsAreFullfilled = requiredFields.every(Boolean);
+
+    if (!requiredFieldsAreFullfilled)
+      throw new Error("Missing required fields");
+    await db
+      .update(courseTable)
+      .set({ isPublished: true })
+      .where(eq(courseTable.id, courseId));
+    revalidatePath(path);
+  } catch (error) {
+    console.log("PUBLISH COURSE ERROR", error);
+    throw new Error("Failed to publish course");
+  }
+}
+
+interface UnpublishCourseProps {
+  courseId: string;
+  path: string;
+}
+
+export async function unPublishCourse({
+  courseId,
+  path,
+}: UnpublishCourseProps) {
+  try {
+    const { userId } = auth();
+    if (!userId) throw new Error("Unautherized");
+
+    const course = await db.query.courseTable.findFirst({
+      where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
+    });
+
+    if (!course) throw new Error("Course not found");
+
+    await db
+      .update(courseTable)
+      .set({ isPublished: false })
+      .where(eq(courseTable.id, courseId));
+    revalidatePath(path);
+  } catch (error) {
+    console.log("UNPUBLISH COURSE ERROR", error);
+    throw new Error("Failed to unpublish course");
+  }
+}
+
 export const fetchCategories = async () => {
   const { userId } = auth();
   if (!userId) {
