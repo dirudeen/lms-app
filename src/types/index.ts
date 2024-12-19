@@ -1,5 +1,6 @@
 import {
  attachmentTable,
+ categoryTable,
  chapterTable,
  courseTable,
  muxDataTable,
@@ -38,4 +39,5 @@ export const chapterInsertSchema =  createInsertSchema(chapterTable, {
   description: z.string().min(1)
 })
 export type MuxData = typeof muxDataTable.$inferSelect;
+export type Category = typeof categoryTable.$inferSelect;
 
