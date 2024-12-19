@@ -39,6 +39,24 @@ export async function createCourse({ title }: { title: string }) {
   }
 }
 
+export async function fetchAllCourses() {
+  try {
+    const { userId } = auth();
+    if (!userId) redirect("/");
+
+    const courses = await db
+      .select()
+      .from(courseTable)
+      .where(eq(courseTable.userId, userId))
+      .orderBy(desc(courseTable.createdAt));
+
+    return courses;
+  } catch (error) {
+    console.log(["GET COURSES", error]);
+    throw new Error("Failed to get courses");
+  }
+}
+
 export async function fetchCourse(courseId: string) {
   const { userId } = auth();
   if (!userId) {
