@@ -1,10 +1,10 @@
 "use server";
 
 import { db } from "@/db";
-import { chapterTable, courseTable, muxDataTable } from "@/db/schema";
+import { chapterTable, courseTable, muxDataTable, userProgressTable } from "@/db/schema";
 import { Chapter } from "@/types";
 import { auth } from "@clerk/nextjs/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -400,5 +400,49 @@ export async function unpublishChapter({
   } catch (error) {
     console.log("UNPUBLISH CHAPTER", error);
     throw new Error("Failed to unpublish the chapter");
+  }
+}
+
+
+export async function fetchCourseProgress(courseId: string) {
+  // TODO: Optimize this function to reduce the number of queries
+  try {
+    const { userId } = auth();
+    if (!userId) throw new Error("Unauthorized");
+    // fetch all the chapter ids of the course that are published
+    const publishChapter = await db
+      .select({id: chapterTable.id})
+      .from(chapterTable)
+      .where(
+        and(
+          eq(chapterTable.courseId, courseId),
+          eq(chapterTable.isPublished, true)
+        )
+      );
+    
+      console.log({"publishChapter": publishChapter});
+      const publishChapterIds = publishChapter.map((chapter) => chapter.id);
+    // Get the number of chapters that have been completed by checking the progress...
+    // ... table of each published chapter using the chapterIds
+
+    const result = await db
+    .select({count: count()})
+    .from(userProgressTable)
+    .where(
+      and(
+        eq(userProgressTable.userId, userId),
+        eq(userProgressTable.isCompleted, true),
+        inArray(userProgressTable.chapterId, publishChapterIds)
+      )
+    )
+    .then((res) => res[0]);
+    console.log({"result": result});
+    // Get the progress percentage of the chapters that has been completed
+    const progressPercentage = (result.count / publishChapterIds.length) * 100;
+    // return the progress percentage
+    return progressPercentage;
+  } catch (error) {
+    console.log("FETCH CHAPTERS PROGRESS", error);
+    throw new Error("Failed to fetch chapters progress");
   }
 }
