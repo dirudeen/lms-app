@@ -8,12 +8,13 @@ import {
 } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { insertCourseSchema } from "@/types/index";
-import { eq, and, asc, desc } from "drizzle-orm";
+import { eq, and, asc, desc, like } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Course } from "@/types";
 import Mux from "@mux/mux-node";
 import { deleteUTFile } from "./uploadthing-action";
+import { fetchCourseProgress } from "./chapters";
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -245,3 +246,65 @@ export const fetchCategories = async () => {
     throw new Error("Failed to get categories");
   }
 };
+
+interface GetCoursesWithProgressAndCategoryProps {
+  title?: string;
+  categoryId?: string;
+}
+
+export async function getCoursesWithProgressAndCategory({
+  title,
+  categoryId,
+}: GetCoursesWithProgressAndCategoryProps) {
+  try {
+    const { userId } = auth();
+    if (!userId) {
+      throw new Error("Unautherized");
+    }
+    //* Apply the filter only if categoryId is not undefined
+    const categoryIdCondition = categoryId
+      ? eq(courseTable.categoryId, categoryId)
+      : undefined;
+    //* Apply the filter only if title is not undefined
+    const titleCondition = title
+      ? like(courseTable.title, `%${title}%`)
+      : undefined;
+
+    //* Fetch the courses in descending order with progress, category, purchases and chapter Ids
+    const courses = await db.query.courseTable.findMany({
+      orderBy: desc(courseTable.createdAt),
+      where: and(
+        eq(courseTable.userId, userId),
+        eq(courseTable.isPublished, true),
+        titleCondition,
+        categoryIdCondition
+      ),
+      with: {
+        category: true,
+        purchases: {
+          where: eq(courseTable.userId, userId),
+        },
+        chapters: {
+          columns: { id: true },
+          where: eq(chapterTable.isPublished, true),
+        },
+      },
+    });
+
+    //* return the progress of each course if the course has purchases
+    const coursesWithProgress = await Promise.all(
+      courses.map(async (course) => {
+        if (course.purchases.length === 0) {
+          return { ...course, progress: null };
+        }
+
+        const progressPentage = await fetchCourseProgress(course.id);
+        return { ...course, progress: progressPentage };
+      })
+    );
+    return coursesWithProgress;
+  } catch (error) {
+    console.log("GET COURSES WITH PROGRESS AND CATEGORY", error);
+    throw new Error("Failed to get courses with progress and category");
+  }
+}
