@@ -19,9 +19,14 @@ export const courseTable = pgTable('Course', {
     }
 });
 
-export const courseRelations = relations(courseTable, ({many}) => ({
+export const courseRelations = relations(courseTable, ({one, many}) => ({
     attachments: many(attachmentTable), 
     chapters: many(chapterTable),
+    purchases: many(puchaseTable),
+    category: one(categoryTable, {
+        fields: [courseTable.categoryId],
+        references: [categoryTable.id]
+    })
 }))
 
 export const categoryTable = pgTable("Category", {
@@ -114,6 +119,13 @@ export const puchaseTable = pgTable("Purchase", {
         puchaseTableCourseIdx: index("puchase_table_course_idx").on(table.courseId),
     }
 })
+
+export const purchaseRelations = relations(puchaseTable, ({one}) => ({
+    course: one(courseTable, {
+        fields: [puchaseTable.courseId],
+        references: [courseTable.id]
+    })
+}))
 
 export const stripeCustomerTable = pgTable("StripeCustomer", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
