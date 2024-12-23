@@ -25,7 +25,7 @@ export default function CourseItem({
   id,
 }: CourseItemProps) {
   return (
-    <Link href={`/course/${id}`}>
+    <Link href={`/courses/${id}`}>
       <div className="group hover:shadow-sm transition overflow-hidden border rounded-lg p-3 h-full hover:scale-105">
         <div className="relative w-full aspect-video rounded-md overflow-hidden">
           <Image src={imageUrl} alt={title} fill className="object-cover" />
