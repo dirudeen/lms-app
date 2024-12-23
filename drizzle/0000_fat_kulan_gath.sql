@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "Course" (
 	"description" text,
 	"image_url" varchar,
 	"price" numeric(12, 2),
-	"is_published" boolean DEFAULT false,
+	"is_published" boolean DEFAULT false NOT NULL,
 	"category_id" uuid,
 	"updated_at" timestamp(3) DEFAULT now() NOT NULL,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL
@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS "Purchase" (
 	"user_id" varchar(255) NOT NULL,
 	"course_id" uuid NOT NULL,
 	"updated_at" timestamp(3) DEFAULT now() NOT NULL,
-	"created_at" timestamp(3) DEFAULT now() NOT NULL
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	CONSTRAINT "user_id_course_id_unique" UNIQUE("user_id","course_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "StripeCustomer" (
@@ -72,7 +73,8 @@ CREATE TABLE IF NOT EXISTS "UserProgress" (
 	"updated_at" timestamp(3) DEFAULT now() NOT NULL,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	CONSTRAINT "UserProgress_user_id_unique" UNIQUE("user_id"),
-	CONSTRAINT "UserProgress_chapter_id_unique" UNIQUE("chapter_id")
+	CONSTRAINT "UserProgress_chapter_id_unique" UNIQUE("chapter_id"),
+	CONSTRAINT "user_id_chapter_id_unique" UNIQUE("user_id","chapter_id")
 );
 --> statement-breakpoint
 DO $$ BEGIN

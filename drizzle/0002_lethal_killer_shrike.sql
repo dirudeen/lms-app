@@ -1,2 +1,0 @@
-ALTER TABLE "Purchase" ADD CONSTRAINT "user_id_course_id_unique" UNIQUE("user_id","course_id");--> statement-breakpoint
-ALTER TABLE "UserProgress" ADD CONSTRAINT "user_id_chapter_id_unique" UNIQUE("user_id","chapter_id");

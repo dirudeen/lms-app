@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1734190411828,
-      "tag": "0000_fat_chimera",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1734532228384,
-      "tag": "0001_chemical_speedball",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1734955831588,
-      "tag": "0002_lethal_killer_shrike",
+      "when": 1734959963555,
+      "tag": "0000_fat_kulan_gath",
       "breakpoints": true
     }
   ]

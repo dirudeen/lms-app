@@ -1,5 +1,5 @@
 {
-  "id": "ad5c7803-2ee2-4bc0-aade-e39d08ffdf01",
+  "id": "8eabf569-5120-4224-8861-367ab757891c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -287,7 +287,7 @@
           "name": "is_published",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         },
         "category_id": {
@@ -474,7 +474,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "user_id_course_id_unique": {
+          "name": "user_id_course_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
+            "course_id"
+          ]
+        }
+      }
     },
     "public.StripeCustomer": {
       "name": "StripeCustomer",
@@ -624,6 +633,14 @@
           "name": "UserProgress_chapter_id_unique",
           "nullsNotDistinct": false,
           "columns": [
+            "chapter_id"
+          ]
+        },
+        "user_id_chapter_id_unique": {
+          "name": "user_id_chapter_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
             "chapter_id"
           ]
         }
