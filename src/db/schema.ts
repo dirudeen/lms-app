@@ -22,7 +22,7 @@ export const courseTable = pgTable('Course', {
 export const courseRelations = relations(courseTable, ({one, many}) => ({
     attachments: many(attachmentTable), 
     chapters: many(chapterTable),
-    purchases: many(puchaseTable),
+    purchases: many(purchaseTable),
     category: one(categoryTable, {
         fields: [courseTable.categoryId],
         references: [categoryTable.id]
@@ -80,7 +80,8 @@ export const chapterRelations = relations(chapterTable, ({one, many}) => ({
         fields: [chapterTable.courseId],
         references: [courseTable.id]
     }),
-    muxData: one(muxDataTable)
+    muxData: one(muxDataTable),
+    userProgress: many(userProgressTable)
 }))
 
 export const muxDataTable = pgTable("MuxData", {
@@ -110,7 +111,14 @@ export const userProgressTable = pgTable("UserProgress", {
     }
 })
 
-export const puchaseTable = pgTable("Purchase", {
+export const userProgressRelations = relations(userProgressTable, ({one}) => ({
+    chapter: one(chapterTable, {
+        fields: [userProgressTable.chapterId],
+        references: [chapterTable.id]
+    })
+}))
+
+export const purchaseTable = pgTable("Purchase", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
     userId: varchar("user_id", {length: 255}).notNull(),
     courseId: uuid("course_id").notNull().references(() => courseTable.id, {onDelete: "cascade"}),
@@ -122,9 +130,9 @@ export const puchaseTable = pgTable("Purchase", {
     }
 })
 
-export const purchaseRelations = relations(puchaseTable, ({one}) => ({
+export const purchaseRelations = relations(purchaseTable, ({one}) => ({
     course: one(courseTable, {
-        fields: [puchaseTable.courseId],
+        fields: [purchaseTable.courseId],
         references: [courseTable.id]
     })
 }))
