@@ -404,7 +404,7 @@ export async function unpublishChapter({
 }
 
 
-export async function fetchCourseProgress(courseId: string) {
+export async function fetchProgress(courseId: string) {
   // TODO: Optimize this function to reduce the number of queries
   try {
     const { userId } = auth();
@@ -420,7 +420,6 @@ export async function fetchCourseProgress(courseId: string) {
         )
       );
     
-      console.log({"publishChapter": publishChapter});
       const publishChapterIds = publishChapter.map((chapter) => chapter.id);
     // Get the number of chapters that have been completed by checking the progress...
     // ... table of each published chapter using the chapterIds
@@ -436,7 +435,6 @@ export async function fetchCourseProgress(courseId: string) {
       )
     )
     .then((res) => res[0]);
-    console.log({"result": result});
     // Get the progress percentage of the chapters that has been completed
     const progressPercentage = (result.count / publishChapterIds.length) * 100;
     // return the progress percentage

@@ -5,6 +5,7 @@ import {
   categoryTable,
   chapterTable,
   courseTable,
+  userProgressTable,
 } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { insertCourseSchema } from "@/types/index";
@@ -14,7 +15,7 @@ import { revalidatePath } from "next/cache";
 import { Course } from "@/types";
 import Mux from "@mux/mux-node";
 import { deleteUTFile } from "./uploadthing-action";
-import { fetchCourseProgress } from "./chapters";
+import { fetchProgress } from "./chapters";
 
 export async function createCourse({ title }: { title: string }) {
   const { userId } = auth();
@@ -298,7 +299,7 @@ export async function getCoursesWithProgressAndCategory({
           return { ...course, progress: null };
         }
 
-        const progressPentage = await fetchCourseProgress(course.id);
+        const progressPentage = await fetchProgress(course.id);
         return { ...course, progress: progressPentage };
       })
     );
@@ -306,5 +307,42 @@ export async function getCoursesWithProgressAndCategory({
   } catch (error) {
     console.log("GET COURSES WITH PROGRESS AND CATEGORY", error);
     throw new Error("Failed to get courses with progress and category");
+  }
+}
+
+interface GetCourseWithChaptersAndProgressProps {
+  courseId: string;
+}
+
+export async function getCourseWithChaptersAndProgress({courseId}:GetCourseWithChaptersAndProgressProps) {
+  try {
+    const { userId } = auth()
+    if(!userId) {
+      redirect("/")
+    }
+    const course = await db.query.courseTable.findFirst({
+      where: and(
+        eq(courseTable.id, courseId),
+        eq(courseTable.userId, userId)
+      ),
+      with: {
+        chapters: {
+          orderBy: asc(chapterTable.position),
+          where: eq(chapterTable.isPublished, true),
+          with: {
+            userProgress: {
+              where: eq(userProgressTable.userId, userId)
+            }
+          }
+        },
+      }
+    })
+    if(!course) {
+      redirect("/")
+    }
+    return course
+  } catch (error) {
+    console.log("GET COURSE WITH CHAPTERS AND PROGRESS", error)
+    throw new Error("Failed to get course with chapters and progress")
   }
 }
