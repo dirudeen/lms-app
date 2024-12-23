@@ -4,6 +4,7 @@ import {
  chapterTable,
  courseTable,
  muxDataTable,
+ userProgressTable,
 } from "@/db/schema";
 import { createInsertSchema,  } from "drizzle-zod";
 import * as z from "zod";
@@ -40,4 +41,5 @@ export const chapterInsertSchema =  createInsertSchema(chapterTable, {
 })
 export type MuxData = typeof muxDataTable.$inferSelect;
 export type Category = typeof categoryTable.$inferSelect;
+export type UserProgress = typeof userProgressTable.$inferSelect
 
