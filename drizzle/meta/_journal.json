@@ -15,6 +15,13 @@
       "when": 1734532228384,
       "tag": "0001_chemical_speedball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1734955831588,
+      "tag": "0002_lethal_killer_shrike",
+      "breakpoints": true
     }
   ]
 }

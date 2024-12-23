@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { boolean, index, integer, numeric, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, numeric, pgTable, text, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { timestampObj } from "./pgTableHelpers";
 
 
@@ -106,6 +106,7 @@ export const userProgressTable = pgTable("UserProgress", {
 }, (table) => {
     return {
         userProgressTableChapterIdx: index("user_progress_table_chapter_idx").on(table.chapterId),
+        userIdChapterIdUnique: unique("user_id_chapter_id_unique").on(table.userId, table.chapterId)
     }
 })
 
@@ -117,6 +118,7 @@ export const puchaseTable = pgTable("Purchase", {
 }, (table) => {
     return {
         puchaseTableCourseIdx: index("puchase_table_course_idx").on(table.courseId),
+        userIdCourseIdUnique: unique("user_id_course_id_unique").on(table.userId, table.courseId)
     }
 })
 
