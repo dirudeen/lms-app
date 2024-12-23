@@ -1,6 +1,7 @@
 import NavbarRoutes from "@/components/navbarRoutes";
 import { Chapter, Course, UserProgress } from "@/types";
 import React from "react";
+import CourseMobileSidebar from "./courseMobileSidebar";
 
 interface CourseNavbarProps {
   course: Course & {
@@ -11,8 +12,14 @@ interface CourseNavbarProps {
   progressCount: number;
 }
 
-export default function CourseNavbar({ course, progressCount }: CourseNavbarProps) {
-  return <header className="p-4 border-b h-full flex items-center bg-white shadow-sm">
-    <NavbarRoutes />
-  </header>;
+export default function CourseNavbar({
+  course,
+  progressCount,
+}: CourseNavbarProps) {
+  return (
+    <header className="p-4 border-b h-full flex items-center bg-white shadow-sm">
+      <CourseMobileSidebar course={course} progressCount={progressCount} />
+      <NavbarRoutes />
+    </header>
+  );
 }
