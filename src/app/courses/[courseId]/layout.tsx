@@ -22,7 +22,7 @@ export default async function CourseLayout({
           progressCount={progressCount}
           />
       </div>
-      <main>{children}</main>
+      <main className="md:pl-80 h-full">{children}</main>
     </div>
   );
 }

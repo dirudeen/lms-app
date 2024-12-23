@@ -35,10 +35,22 @@ export default function CourseSidebarItem({courseId, id, label, isCompleted, isL
     type="button"
     onClick={handleClick}
     >
-    <div>
-        <Icon />
+    <div className="flex items-center gap-2 py-4">
+        <Icon className={cn(
+            "text-slate-500",
+            isCompleted && "text-emerald-700",
+            isActive && "text-slate-700" 
+        )
+        } />
         {label}
     </div>
-    </button>
+    <div className={cn(
+        "ml-auto opacity-0 border-slate-700 h-full transition-all",
+        isActive && "opacity-100",
+        isCompleted && "border-emerald-700"
+    )}
+        />
+        
+        </button>
   )
 }
