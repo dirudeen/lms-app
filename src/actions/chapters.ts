@@ -450,3 +450,108 @@ export async function fetchProgress(courseId: string) {
     throw new Error("Failed to fetch chapters progress");
   }
 }
+
+export async function getCourseDetailsWithChapterData({
+  chapterId,
+  courseId,
+}: {
+  courseId: string;
+  chapterId: string;
+}) {
+  try {
+    const { userId } = auth();
+    if (!userId) redirect("/");
+
+    //* Get the purchased record of this course in db
+    const purchase = await db
+      .select()
+      .from(purchaseTable)
+      .where(
+        and(
+          eq(purchaseTable.courseId, courseId),
+          eq(purchaseTable.userId, userId)
+        )
+      )
+      .then((res) => res[0]);
+
+    const course = await db
+      .select({ price: courseTable.price })
+      .from(courseTable)
+      .where(eq(courseTable.id, courseId))
+      .then((res) => res[0]);
+
+    const chapter = await db
+      .select()
+      .from(chapterTable)
+      .where(eq(chapterTable.id, chapterId))
+      .then((res) => res[0]);
+
+    //* Check if the course and chapter exists
+    if (!chapter || !course) {
+      throw new Error("Course or chapter not found");
+    }
+
+    let muxData = null;
+    let attachments: Attachment[] = [];
+    let nextChapter = null;
+
+    //* Fetch the mux data, attachments and next chapter only if the course is purchased
+    if (purchase) {
+      attachments = await db
+        .select()
+        .from(attachmentTable)
+        .where(eq(attachmentTable.courseId, courseId));
+    }
+    //* Fetch the mux data only if the chapter is free or the course is purchased
+    if (chapter.isFree || purchase) {
+      muxData = await db
+        .select()
+        .from(muxDataTable)
+        .where(eq(muxDataTable.chapterId, chapterId))
+        .then((res) => res[0]);
+
+      nextChapter = await db
+        .select()
+        .from(chapterTable)
+        .where(
+          and(
+            eq(chapterTable.courseId, courseId),
+            gt(chapterTable.position, chapter.position),
+            eq(chapterTable.isPublished, true)
+          )
+        )
+        .orderBy(asc(chapterTable.position))
+        .then((res) => res[0]);
+    }
+
+    const userProgress = await db
+      .select()
+      .from(userProgressTable)
+      .where(
+        and(
+          eq(userProgressTable.userId, userId),
+          eq(userProgressTable.chapterId, chapterId)
+        )
+      )
+      .then((res) => res[0]);
+
+    return {
+      course,
+      chapter,
+      muxData,
+      attachments,
+      nextChapter,
+      userProgress,
+      purchase,
+    };
+  } catch (error) {
+    console.log(["GET COURSE DETAILS WITH CHAPTER DATA", error]);
+    return {
+      course: null,
+      chapter: null,
+      muxData: null,
+      attachments: [],
+      nextChapter: null,
+    };
+  }
+}
