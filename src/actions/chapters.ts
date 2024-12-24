@@ -1,10 +1,17 @@
 "use server";
 
 import { db } from "@/db";
-import { chapterTable, courseTable, muxDataTable, userProgressTable } from "@/db/schema";
-import { Chapter } from "@/types";
+import {
+  attachmentTable,
+  chapterTable,
+  courseTable,
+  muxDataTable,
+  purchaseTable,
+  userProgressTable,
+} from "@/db/schema";
+import { Attachment, Chapter } from "@/types";
 import { auth } from "@clerk/nextjs/server";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -403,7 +410,6 @@ export async function unpublishChapter({
   }
 }
 
-
 export async function fetchProgress(courseId: string) {
   // TODO: Optimize this function to reduce the number of queries
   try {
@@ -411,7 +417,7 @@ export async function fetchProgress(courseId: string) {
     if (!userId) throw new Error("Unauthorized");
     // fetch all the chapter ids of the course that are published
     const publishChapter = await db
-      .select({id: chapterTable.id})
+      .select({ id: chapterTable.id })
       .from(chapterTable)
       .where(
         and(
@@ -419,22 +425,22 @@ export async function fetchProgress(courseId: string) {
           eq(chapterTable.isPublished, true)
         )
       );
-    
-      const publishChapterIds = publishChapter.map((chapter) => chapter.id);
+
+    const publishChapterIds = publishChapter.map((chapter) => chapter.id);
     // Get the number of chapters that have been completed by checking the progress...
     // ... table of each published chapter using the chapterIds
 
     const result = await db
-    .select({count: count()})
-    .from(userProgressTable)
-    .where(
-      and(
-        eq(userProgressTable.userId, userId),
-        eq(userProgressTable.isCompleted, true),
-        inArray(userProgressTable.chapterId, publishChapterIds)
+      .select({ count: count() })
+      .from(userProgressTable)
+      .where(
+        and(
+          eq(userProgressTable.userId, userId),
+          eq(userProgressTable.isCompleted, true),
+          inArray(userProgressTable.chapterId, publishChapterIds)
+        )
       )
-    )
-    .then((res) => res[0]);
+      .then((res) => res[0]);
     // Get the progress percentage of the chapters that has been completed
     const progressPercentage = (result.count / publishChapterIds.length) * 100;
     // return the progress percentage
