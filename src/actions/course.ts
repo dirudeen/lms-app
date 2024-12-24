@@ -314,31 +314,30 @@ interface GetCourseWithChaptersAndProgressProps {
   courseId: string;
 }
 
-export async function getCourseWithChaptersAndProgress({courseId}:GetCourseWithChaptersAndProgressProps) {
+export async function getCourseWithChaptersAndProgress({
+  courseId,
+}: GetCourseWithChaptersAndProgressProps) {
   try {
-    const { userId } = auth()
-    if(!userId) {
-      redirect("/")
+    const { userId } = auth();
+    if (!userId) {
+      redirect("/");
     }
     const course = await db.query.courseTable.findFirst({
-      where: and(
-        eq(courseTable.id, courseId),
-        eq(courseTable.userId, userId)
-      ),
+      where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
       with: {
         chapters: {
           orderBy: asc(chapterTable.position),
           where: eq(chapterTable.isPublished, true),
           with: {
             userProgress: {
-              where: eq(userProgressTable.userId, userId)
-            }
-          }
+              where: eq(userProgressTable.userId, userId),
+            },
+          },
         },
-      }
-    })
-    if(!course) {
-      redirect("/")
+      },
+    });
+    if (!course) {
+      redirect("/");
     }
     return course
   } catch (error) {
