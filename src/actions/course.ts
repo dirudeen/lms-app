@@ -339,9 +339,40 @@ export async function getCourseWithChaptersAndProgress({
     if (!course) {
       redirect("/");
     }
-    return course
+    return course;
   } catch (error) {
-    console.log("GET COURSE WITH CHAPTERS AND PROGRESS", error)
-    throw new Error("Failed to get course with chapters and progress")
+    console.log("GET COURSE WITH CHAPTERS AND PROGRESS", error);
+    throw new Error("Failed to get course with chapters and progress");
+  }
+}
+
+export async function getCourseWithChapters({
+  courseId,
+}: {
+  courseId: string;
+}) {
+  try {
+    const { userId } = auth();
+    if (!userId) {
+      redirect("/");
+    }
+
+    const course = await db.query.courseTable.findFirst({
+      where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
+      with: {
+        chapters: {
+          orderBy: asc(chapterTable.position),
+          where: eq(chapterTable.isPublished, true),
+        },
+      },
+    });
+
+    if (!course) {
+      redirect("/");
+    }
+    return course;
+  } catch (error) {
+    console.log("GET COURSE WITH CHAPTERS", error);
+    throw new Error("Failed to get course with chapters");
   }
 }
