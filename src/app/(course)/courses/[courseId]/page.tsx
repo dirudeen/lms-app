@@ -1,14 +1,15 @@
-import React from 'react'
+import { getCourseWithChapters } from "@/actions/course";
+import { redirect } from "next/navigation";
 
-interface PageProps {
-    params: {
-        courseId: string;
-    }
+interface CourseIdPageProps {
+  params: {
+    courseId: string;
+  };
 }
 
-export default function Page({ params }: PageProps) {
-   const courseId = params.courseId;
-  return (
-    <div>{courseId}</div>
-  )
+export default async function CourseIdPage({ params }: CourseIdPageProps) {
+  const courseId = params.courseId;
+  const course = await getCourseWithChapters({ courseId });
+
+  return redirect(`/courses/${courseId}/chapters/${course.chapters[0].id}`);
 }
