@@ -30,7 +30,6 @@ export default function CourseSidebarItem({courseId, id, label, isCompleted, isL
         isActive && "text-slate-700 bg-slate-200/20 hover:bg-slate-200/20 hover:text-slate-700",
         isCompleted && "text-emerald-700 hober:text-emerald-700",
         isActive && isCompleted && "bg-emerald-200/20"
-
     )}
     type="button"
     onClick={handleClick}
@@ -45,7 +44,7 @@ export default function CourseSidebarItem({courseId, id, label, isCompleted, isL
         {label}
     </div>
     <div className={cn(
-        "ml-auto opacity-0 border-slate-700 h-full transition-all",
+        "ml-auto opacity-0 border-slate-700 h-full transition-all border",
         isActive && "opacity-100",
         isCompleted && "border-emerald-700"
     )}
