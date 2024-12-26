@@ -1,10 +1,11 @@
 "use client";
 
+import { updateUserProgress } from "@/actions/userProgress";
 import { useConfettiStore } from "@/hooks/use-confetti-store";
 import { cn } from "@/lib/utils";
 import MuxPlayer from "@mux/mux-player-react";
 import { Loader2, Lock } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -28,6 +29,34 @@ export default function VideoPlayer({
   playbackId,
 }: VideoPlayerProps) {
   const [isReady, setIsReady] = useState(false);
+  const router = useRouter();
+  const path = usePathname();
+  const confetti = useConfettiStore();
+
+  const onEndHandler = async () => {
+    try {
+      if (completeOnEnd) {
+        await updateUserProgress({
+          courseId,
+          chapterId,
+          isCompleted: true,
+          path,
+        });
+        if (!nextChapterId) {
+          confetti.onOpen();
+        }
+        if (nextChapterId) {
+          router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
+        }
+        toast.success("Progress updated");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }
+  };
+
   return (
     <div className="relative aspect-video">
       {!isLocked && (
@@ -43,12 +72,10 @@ export default function VideoPlayer({
       )}
       {!isLocked && (
         <MuxPlayer
-          className={cn(
-            "absolute h-full",
-            !isReady && "hidden")}
+          className={cn("absolute h-full", !isReady && "hidden")}
           title={title}
           onCanPlay={() => setIsReady((prev) => !prev)}
-          onEnded={() => {}}
+          onEnded={onEndHandler}
           autoPlay
           playbackId={playbackId}
         />
