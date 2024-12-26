@@ -4,6 +4,7 @@ import React from "react";
 import { IconBadge } from "./IconBadge";
 import { formatPrice } from "@/lib/format";
 import Link from "next/link";
+import CourseProgress from "./courseProgress";
 
 interface CourseItemProps {
   title: string;
@@ -44,7 +45,11 @@ export default function CourseItem({
             </div>
           </div>
           {progress !== null ? (
-            <div>TODO: Progress component</div>
+            <CourseProgress
+              value={progress}
+              variant={progress === 100 ? "success": "default"}
+              size="sm"
+            />
           ) : (
             <p>{formatPrice(parseFloat(price || "0"))}</p>
           )}
