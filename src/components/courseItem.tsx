@@ -47,7 +47,7 @@ export default function CourseItem({
           {progress !== null ? (
             <CourseProgress
               value={progress}
-              variant={progress === 100 ? "success": "default"}
+              variant={progress === 100 ? "success" : "default"}
               size="sm"
             />
           ) : (
