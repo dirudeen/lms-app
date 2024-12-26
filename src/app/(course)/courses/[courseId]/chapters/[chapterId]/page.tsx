@@ -7,6 +7,7 @@ import CourseEnrollBotton from "./_components/courseEnrollButton";
 import { Separator } from "@/components/ui/separator";
 import Preview from "@/components/preview";
 import { File } from "lucide-react";
+import CourseProgressButton from "./_components/courseProgressButton";
 
 interface ChapterIdPageProps {
   params: {
@@ -61,7 +62,12 @@ export default async function ChapterIdPage({ params }: ChapterIdPageProps) {
             <h1 className="text-2xl font-semibold mb-2">{chapter.title}</h1>
             {purchase ? (
               <div>
-                {/* Todo: add progress  */}
+                <CourseProgressButton 
+                courseId={courseId}
+                chapterId={chapterId}
+                nextChapterId={nextChapter?.id}
+                isCompleted={!!userProgress?.isCompleted}
+                />
               </div>
             ):
             (<CourseEnrollBotton
