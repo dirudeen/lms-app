@@ -2,6 +2,7 @@ import { getCoursePurchase } from '@/actions/purchase'
 import { Chapter, Course, UserProgress } from '@/types'
 import React from 'react'
 import CourseSidebarItem from './courseSidebarItem'
+import CourseProgress from '@/components/courseProgress'
 
 type CourseSidebarProps = {
     course: Course & {
@@ -18,6 +19,14 @@ export default async function CourseSidebar({course, progressCount}: CourseSideb
     <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
     <div className='p-8 flex flex-col border-b'>
         <h1 className='font-semibold'>{course.title}</h1>
+        {purchase && (
+            <div className="mt-10">
+                <CourseProgress
+                value={progressCount}
+                variant="success"
+                />
+            </div>
+        )}
     </div>
     <div className="flex flex-col w-full">
         {course.chapters.map(chapter => (
