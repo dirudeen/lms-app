@@ -100,14 +100,13 @@ export const muxDataRelations = relations(muxDataTable, ({one, many}) => ({
 
 export const userProgressTable = pgTable("UserProgress", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-    userId: varchar("user_id", {length: 255}).notNull().unique(),
+    userId: varchar("user_id", {length: 255}).notNull(),
     chapterId: uuid("chapter_id").unique().notNull().references(() => chapterTable.id, {onDelete: "cascade"}),
     isCompleted: boolean("is_completed").default(false).notNull(),
     ...timestampObj
 }, (table) => {
     return {
         userProgressTableChapterIdx: index("user_progress_table_chapter_idx").on(table.chapterId),
-        userIdChapterIdUnique: unique("user_id_chapter_id_unique").on(table.userId, table.chapterId)
     }
 })
 
