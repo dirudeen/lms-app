@@ -30,7 +30,12 @@ export default function CourseProgressButton({
   const clickHandler = async () => {
     setIsLoading(true);
     try {
-      await updateUserProgress({ courseId, chapterId, isCompleted, path });
+      await updateUserProgress({
+        courseId,
+        chapterId,
+        isCompleted: !isCompleted,
+        path,
+      });
       if (!isCompleted && !nextChapterId) {
         confetti.onOpen();
       }
