@@ -131,12 +131,20 @@ export async function deleteCourse({ courseId }: DeleteCourseProps) {
     if (!userId) throw new Error("Unautherized");
 
     const course = await db.query.courseTable.findFirst({
-      with: { chapters: { with: { muxData: true } } },
+      with: { chapters: { with: { muxData: true } }, attachments: true },
       where: and(eq(courseTable.id, courseId), eq(courseTable.userId, userId)),
     });
 
     if (!course) throw new Error("Course not found");
-
+    
+    if (course.imageUrl) {
+      await deleteUTFile(course.imageUrl);
+    }
+    if (course.attachments.length !== 0) {
+      for (const attachment of course.attachments) {
+        await deleteUTFile(attachment.url);
+      }
+    }
     if (course.chapters.length !== 0) {
       // delete the assets stored in mux and uploadthing
       for (const chapter of course.chapters) {
