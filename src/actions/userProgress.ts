@@ -24,13 +24,13 @@ export async function updateUserProgress({
     await db
       .insert(userProgressTable)
       .values({
-        isCompleted: !isCompleted,
+        isCompleted: isCompleted,
         userId,
         chapterId,
       })
       .onConflictDoUpdate({
-        target: [userProgressTable.userId, userProgressTable.chapterId],
-        set: { isCompleted: !isCompleted },
+        target: userProgressTable.chapterId,
+        set: { isCompleted: isCompleted },
       });
     revalidatePath(path);
   } catch (error) {
