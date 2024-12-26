@@ -43,7 +43,7 @@ export function ChapterVideoForm({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await updateChapter({ courseId, path: pathname, values, chapterId });
-      toast.success("Course image updated");
+      toast.success("Chapter video updated");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
